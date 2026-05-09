@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>מצלאוי – ניהול נכסים</title>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue-dark:#1a3a6b;--blue-mid:#1e5fa8;--blue-light:#3a8fd4;
+  --gold:#b8943a;--gold-light:#d4b05a;
+  --bg:#f2f5fa;--bg-card:#ffffff;
+  --text-main:#1a2540;--text-sub:#5a6a85;--text-light:#9aabb0;
+  --border:#e0e8f4;
+  --green:#27500A;--green-bg:#EAF3DE;--green-bd:#C0DD97;
+  --orange:#633806;--orange-bg:#FAEEDA;--orange-bd:#FAC775;
+  --blue-st:#0C447C;--blue-st-bg:#E6F1FB;--blue-st-bd:#85B7EB;
+  --red:#A32D2D;--red-bd:#E24B4A;
+  --gray:#5F5E5A;--gray-bg:#F1EFE8;
+  --radius:14px;--radius-sm:8px;
+  --shadow:0 2px 12px rgba(26,58,107,0.08);
+  --shadow-lg:0 8px 28px rgba(26,58,107,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-main);min-height:100vh;overflow-x:hidden;}
+.screen{display:none;flex-direction:column;min-height:100vh;}
+.screen.active{display:flex;}
+
+/* TOPBAR */
+.tb{background:var(--blue-dark);padding:11px 14px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(26,58,107,0.25);}
+.tb-title{font-size:15px;font-weight:600;color:#fff;flex:1;}
+.tb-sub{font-size:10px;color:rgba(255,255,255,.55);margin-top:1px;}
+.tb-btn{background:rgba(255,255,255,.13);border:none;border-radius:9px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;}
+.tb-btn:active{background:rgba(255,255,255,.25);}
+
+/* SEARCH */
+.search-wrap{background:var(--blue-dark);padding:0 14px 13px;}
+.search-row{display:flex;gap:8px;}
+.s-box{flex:1;background:rgba(255,255,255,.11);border:0.5px solid rgba(255,255,255,.2);border-radius:11px;padding:9px 12px;display:flex;align-items:center;gap:8px;}
+.s-box input{flex:1;background:none;border:none;outline:none;color:#fff;font-family:'Assistant',sans-serif;font-size:14px;}
+.s-box input::placeholder{color:rgba(255,255,255,.45);}
+.s-icon{color:rgba(255,255,255,.5);font-size:15px;}
+.filter-pill{background:var(--gold);border:none;border-radius:11px;padding:9px 14px;color:#fff;font-family:'Assistant',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.filter-count{background:#fff;color:var(--gold);border-radius:10px;font-size:11px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center;}
+
+/* SCROLL BODY */
+.sbody{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch;}
+
+/* PROJECT CARDS */
+.proj-card{background:var(--bg-card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;border:0.5px solid var(--border);overflow:hidden;cursor:pointer;}
+.proj-card:active{transform:scale(.99);}
+.pc-head{background:var(--blue-dark);padding:13px 14px;display:flex;align-items:center;justify-content:space-between;}
+.pc-name{font-size:16px;font-weight:700;color:#fff;}
+.pc-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;}
+.ring-wrap{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.ring-svg{width:48px;height:48px;}
+.ring-pct{font-size:13px;font-weight:700;color:var(--gold-light);margin-top:-40px;position:relative;z-index:1;text-align:center;}
+.ring-lbl{font-size:9px;color:rgba(255,255,255,.45);text-align:center;}
+.pc-body{display:flex;}
+.pc-stat{flex:1;text-align:center;padding:10px 6px;}
+.pc-stat+.pc-stat{border-right:0.5px solid var(--border);}
+.pc-val{font-size:21px;font-weight:700;}
+.pc-lbl{font-size:10px;color:var(--text-sub);margin-top:2px;line-height:1.3;}
+.pc-foot{padding:8px 14px;background:#f8f9fc;border-top:0.5px solid var(--border);font-size:11px;color:var(--text-light);display:flex;justify-content:space-between;align-items:center;}
+
+/* BUILDING CARDS */
+.bld-card{background:var(--bg-card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:11px;border:0.5px solid var(--border);overflow:hidden;cursor:pointer;}
+.bld-card:active{transform:scale(.99);}
+.bld-head{background:var(--blue-mid);padding:11px 13px;display:flex;justify-content:space-between;align-items:center;}
+.bld-name{font-size:14px;font-weight:700;color:#fff;}
+.bld-pct{font-size:12px;font-weight:600;color:var(--gold-light);}
+.bld-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}
+.bs{text-align:center;padding:8px 4px;border-bottom:0.5px solid var(--border);}
+.bs:nth-child(n+4){border-bottom:none;}
+.bs+.bs{border-right:0.5px solid var(--border);}
+.bs-val{font-size:18px;font-weight:700;}
+.bs-lbl{font-size:9px;color:var(--text-sub);margin-top:2px;line-height:1.3;}
+.c-dark{color:var(--blue-dark);} .c-green{color:var(--green);} .c-orange{color:var(--orange);}
+.c-blue{color:var(--blue-st);} .c-red{color:var(--red);} .c-gray{color:var(--gray);}
+
+/* LEGEND */
+.legend-bar{display:flex;flex-wrap:wrap;gap:5px;padding:7px 12px;background:var(--bg-card);border-bottom:0.5px solid var(--border);}
+.lg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-sub);}
+.ld{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+
+/* ROOM FILTER */
+.room-filter-bar{display:flex;gap:6px;padding:8px 12px;background:var(--bg);border-bottom:0.5px solid var(--border);overflow-x:auto;}
+.rf-chip{padding:5px 12px;border-radius:14px;font-size:12px;font-weight:500;border:0.5px solid var(--border);color:var(--text-sub);background:var(--bg-card);white-space:nowrap;flex-shrink:0;cursor:pointer;font-family:'Assistant',sans-serif;}
+.rf-chip.on{background:var(--blue-mid);color:#fff;border-color:var(--blue-mid);}
+
+/* BUILDING GRID */
+.bld-grid-wrap{flex:1;overflow-y:auto;padding:10px;background:var(--bg);}
+.dir-headers{display:flex;gap:5px;margin-bottom:6px;}
+.dir-spacer{width:24px;flex-shrink:0;}
+.dir-h{flex:1;font-size:9px;font-weight:600;color:var(--text-sub);text-align:center;background:var(--bg-card);border-radius:6px;padding:4px 2px;border:0.5px solid var(--border);}
+.floor-row{display:flex;align-items:stretch;gap:5px;margin-bottom:5px;}
+.floor-tag{width:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--text-sub);}
+.floor-apts{flex:1;display:flex;gap:5px;}
+.apt-cell{flex:1;border-radius:7px;padding:6px 3px;text-align:center;border:0.5px solid transparent;cursor:pointer;min-width:0;}
+.apt-cell:active{transform:scale(.94);}
+.apt-cell.apt-sold{background:var(--green-bg);border-color:var(--green-bd);}
+.apt-cell.apt-sold .apt-num{color:var(--green);}
+.apt-cell.apt-req{background:var(--orange-bg);border-color:var(--orange-bd);}
+.apt-cell.apt-req .apt-num{color:var(--orange);}
+.apt-cell.apt-land{background:var(--blue-st-bg);border-color:var(--blue-st-bd);}
+.apt-cell.apt-land .apt-num{color:var(--blue-st);}
+.apt-cell.apt-land2{background:var(--blue-st-bg);border-color:var(--red-bd);}
+.apt-cell.apt-land2 .apt-num{color:var(--red);}
+.apt-cell.apt-avail{background:var(--bg-card);border-color:#d0d8e8;}
+.apt-cell.apt-avail .apt-num{color:var(--blue-dark);}
+.apt-cell.apt-faded{opacity:.2;pointer-events:none;}
+.apt-cell.apt-empty{background:transparent;border-color:transparent;pointer-events:none;cursor:default;}
+.apt-num{font-size:12px;font-weight:700;}
+.apt-dir-lbl{font-size:8px;margin-top:2px;opacity:.7;}
+.apt-rooms-lbl{font-size:8px;margin-top:1px;opacity:.6;}
+.apt-land2 .apt-dir-lbl{color:var(--red);}
+
+/* APT DETAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,20,50,.5);z-index:200;display:none;align-items:flex-end;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--bg-card);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding-bottom:32px;animation:slideUp .2s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:38px;height:4px;background:var(--border);border-radius:4px;margin:12px auto 0;display:block;}
+.modal-head{padding:14px 20px 0;display:flex;justify-content:space-between;align-items:flex-start;}
+.modal-apt-n{font-size:22px;font-weight:700;color:var(--text-main);}
+.modal-proj{font-size:12px;color:var(--text-sub);margin-top:2px;}
+.status-badge{padding:5px 13px;border-radius:18px;font-size:13px;font-weight:700;}
+.sb-sold{background:var(--green-bg);color:var(--green);}
+.sb-req{background:var(--orange-bg);color:var(--orange);}
+.sb-land{background:var(--blue-st-bg);color:var(--blue-st);}
+.sb-land2{background:var(--blue-st-bg);color:var(--red);}
+.sb-avail{background:var(--bg);color:var(--blue-dark);border:0.5px solid var(--border);}
+.modal-body{padding:12px 20px;}
+.drow{display:flex;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:14px;}
+.drow:last-of-type{border-bottom:none;}
+.dk{color:var(--text-sub);}
+.dv{font-weight:600;color:var(--text-main);text-align:left;}
+.price-box{background:var(--blue-dark);border-radius:11px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:12px;}
+.price-box .pk{color:rgba(255,255,255,.65);font-size:12px;}
+.price-box .pv{color:#fff;font-size:17px;font-weight:700;}
+.price-zero{background:var(--bg);border-radius:11px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:7px;border:0.5px solid var(--border);}
+.price-zero .pk{color:var(--text-sub);font-size:12px;}
+.price-zero .pv{color:var(--text-main);font-size:15px;font-weight:600;}
+
+/* FILTER PANEL */
+.filter-panel{position:fixed;inset:0;background:rgba(10,20,50,.5);z-index:200;display:none;align-items:flex-end;}
+.filter-panel.open{display:flex;}
+.filter-sheet{background:var(--bg-card);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:32px;animation:slideUp .25s ease;}
+.fhandle{width:38px;height:4px;background:var(--border);border-radius:4px;margin:12px auto 0;display:block;}
+.ftitle{font-size:16px;font-weight:700;color:var(--text-main);padding:14px 20px 6px;}
+.fsect{padding:8px 20px;}
+.flabel{font-size:11px;font-weight:600;color:var(--text-sub);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.finput{width:100%;border:0.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:'Assistant',sans-serif;font-size:14px;color:var(--text-main);background:var(--bg);outline:none;margin-bottom:4px;}
+.finput:focus{border-color:var(--blue-mid);}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.chip{padding:6px 13px;border-radius:18px;font-size:13px;font-weight:500;border:0.5px solid var(--border);color:var(--text-sub);background:var(--bg-card);cursor:pointer;font-family:'Assistant',sans-serif;}
+.chip.on{background:var(--blue-mid);color:#fff;border-color:var(--blue-mid);}
+.factions{display:flex;gap:10px;padding:14px 20px 0;}
+.btn-clear{flex:1;padding:12px;border:0.5px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text-sub);font-family:'Assistant',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-apply{flex:2;padding:12px;border:none;border-radius:12px;background:var(--blue-dark);color:#fff;font-family:'Assistant',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+
+/* SEARCH RESULTS */
+.result-card{background:var(--bg-card);border-radius:var(--radius-sm);box-shadow:var(--shadow);margin-bottom:8px;border:0.5px solid var(--border);padding:12px 14px;cursor:pointer;}
+.result-card:active{transform:scale(.99);}
+.result-apt{font-size:15px;font-weight:700;color:var(--text-main);}
+.result-proj{font-size:12px;color:var(--text-sub);margin-top:2px;}
+.result-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.rtag{padding:3px 9px;border-radius:10px;font-size:12px;font-weight:600;}
+
+/* SETUP */
+.setup-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+.setup-title{font-size:24px;font-weight:700;color:var(--blue-dark);margin-bottom:8px;text-align:center;}
+.setup-sub{font-size:14px;color:var(--text-sub);text-align:center;margin-bottom:28px;line-height:1.7;}
+.setup-field{width:100%;margin-bottom:14px;}
+.setup-label{font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:6px;}
+.setup-input{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Assistant',sans-serif;font-size:14px;color:var(--text-main);background:#fff;outline:none;direction:ltr;}
+.setup-input:focus{border-color:var(--blue-mid);}
+.setup-btn{width:100%;padding:14px;background:var(--blue-dark);color:#fff;border:none;border-radius:14px;font-family:'Assistant',sans-serif;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;}
+.setup-btn:active{opacity:.88;}
+.setup-err{color:#c0392b;font-size:13px;margin-top:12px;text-align:center;}
+
+/* NEW SHEET BANNER */
+.new-banner{background:var(--gold);color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:13px;flex-wrap:wrap;}
+.nb-text{flex:1;}
+.nb-btn{padding:5px 13px;border-radius:8px;font-family:'Assistant',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;}
+.nb-yes{background:#fff;color:var(--gold);}
+.nb-no{background:rgba(255,255,255,.25);color:#fff;}
+
+/* LOADING / EMPTY */
+.loading-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--blue-mid);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--text-sub);}
+.empty-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px;text-align:center;}
+.empty-icon{font-size:44px;opacity:.25;}
+.empty-text{font-size:15px;color:var(--text-sub);}
+
+/* UTILS */
+.tag-sold{background:var(--green-bg);color:var(--green);}
+.tag-req{background:var(--orange-bg);color:var(--orange);}
+.tag-land{background:var(--blue-st-bg);color:var(--blue-st);}
+.tag-land2{background:var(--blue-st-bg);color:var(--red);}
+.tag-avail{background:var(--bg);color:var(--blue-dark);border:0.5px solid var(--border);}
+</style>
+</head>
+<body>
+
+<!-- ═══ SETUP ═══ -->
+<div id="s-setup" class="screen active">
+  <div class="setup-wrap">
+    <div style="width:80px;height:80px;background:var(--blue-dark);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+      <span style="font-size:36px;">🏗️</span>
+    </div>
+    <div class="setup-title">מצלאוי</div>
+    <div class="setup-sub">יזמות והתחדשות בבנייה<br>הזן את מפתח ה-API לחיבור לנתונים</div>
+    <div class="setup-field">
+      <div class="setup-label">Google Sheets API Key</div>
+      <input class="setup-input" id="inp-key" type="password" placeholder="AIzaSy..." autocomplete="off">
+    </div>
+    <button class="setup-btn" id="btn-connect">התחבר</button>
+    <div class="setup-err" id="setup-err"></div>
+    <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:20px;line-height:1.8;">
+      Google Cloud Console → Sheets API → Credentials → Create API Key<br>
+      יש לאפשר גישה לגיליון לכל מי שיש קישור (צופה)
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HOME ═══ -->
+<div id="s-home" class="screen">
+  <div class="tb">
+    <div style="flex:1">
+      <div class="tb-title">מצלאוי</div>
+      <div class="tb-sub">יזמות והתחדשות בבנייה</div>
+    </div>
+    <button class="tb-btn" onclick="showScreen('s-setup')" title="הגדרות">⚙️</button>
+  </div>
+  <div class="search-wrap">
+    <div class="search-row">
+      <div class="s-box">
+        <span class="s-icon">🔍</span>
+        <input id="g-search" type="text" placeholder="חיפוש רוכש, דירה, פרויקט..." oninput="onSearch(this.value)">
+      </div>
+      <button class="filter-pill" onclick="openFilter()">
+        סינון <span class="filter-count" id="filter-count" style="display:none">0</span>
+      </button>
+    </div>
+  </div>
+  <div id="new-banners"></div>
+  <div class="sbody" id="home-body">
+    <div class="loading-wrap"><div class="spinner"></div><div class="loading-text">טוען פרויקטים...</div></div>
+  </div>
+</div>
+
+<!-- ═══ SEARCH RESULTS ═══ -->
+<div id="s-search" class="screen">
+  <div class="tb">
+    <button class="tb-btn" onclick="goHome()">🏠</button>
+    <button class="tb-btn" onclick="showScreen('s-home')">◀</button>
+    <div style="flex:1;margin-right:8px">
+      <div class="tb-title">תוצאות חיפוש</div>
+      <div class="tb-sub" id="search-sub"></div>
+    </div>
+  </div>
+  <div class="sbody" id="search-body"></div>
+</div>
+
+<!-- ═══ PROJECT (buildings) ═══ -->
+<div id="s-project" class="screen">
+  <div class="tb">
+    <button class="tb-btn" onclick="goHome()">🏠</button>
+    <button class="tb-btn" onclick="showScreen('s-home')">◀</button>
+    <div style="flex:1;margin-right:8px">
+      <div class="tb-title" id="proj-title"></div>
+      <div class="tb-sub" id="proj-sub"></div>
+    </div>
+  </div>
+  <div class="sbody" id="proj-body">
+    <div class="loading-wrap"><div class="spinner"></div><div class="loading-text">טוען...</div></div>
+  </div>
+</div>
+
+<!-- ═══ BUILDING (apt grid) ═══ -->
+<div id="s-building" class="screen">
+  <div class="tb">
+    <button class="tb-btn" onclick="goHome()">🏠</button>
+    <button class="tb-btn" onclick="showScreen('s-project')">◀</button>
+    <div style="flex:1;margin-right:8px">
+      <div class="tb-title" id="bld-title"></div>
+      <div class="tb-sub" id="bld-sub"></div>
+    </div>
+  </div>
+  <div class="legend-bar">
+    <div class="lg"><div class="ld" style="background:var(--green-bg);border:0.5px solid var(--green-bd)"></div>חתום</div>
+    <div class="lg"><div class="ld" style="background:var(--orange-bg);border:0.5px solid var(--orange-bd)"></div>בקשת רכישה</div>
+    <div class="lg"><div class="ld" style="background:var(--blue-st-bg);border:0.5px solid var(--blue-st-bd)"></div>ב.קרקע</div>
+    <div class="lg"><div class="ld" style="background:var(--blue-st-bg);border:1px solid var(--red-bd)"></div>ב.קרקע שלב ב</div>
+    <div class="lg"><div class="ld" style="background:#fff;border:0.5px solid #d0d8e8"></div>למכירה</div>
+  </div>
+  <div class="room-filter-bar" id="room-filter-bar"></div>
+  <div class="bld-grid-wrap" id="bld-grid"></div>
+</div>
+
+<!-- ═══ APT DETAIL MODAL ═══ -->
+<div class="modal-overlay" id="apt-modal" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <span class="modal-handle"></span>
+    <div class="modal-head">
+      <div>
+        <div class="modal-apt-n" id="m-apt-n"></div>
+        <div class="modal-proj" id="m-proj"></div>
+      </div>
+      <div class="status-badge" id="m-status"></div>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+  </div>
+</div>
+
+<!-- ═══ FILTER PANEL ═══ -->
+<div class="filter-panel" id="filter-panel" onclick="closeFilterIfOutside(event)">
+  <div class="filter-sheet">
+    <span class="fhandle"></span>
+    <div class="ftitle">סינון נתונים</div>
+
+    <div class="fsect">
+      <div class="flabel">פרויקט</div>
+      <div class="chips" id="f-projects"></div>
+    </div>
+    <div class="fsect">
+      <div class="flabel">סטטוס</div>
+      <div class="chips" id="f-status"></div>
+    </div>
+    <div class="fsect">
+      <div class="flabel">חדרים</div>
+      <div class="chips" id="f-rooms"></div>
+    </div>
+    <div class="fsect">
+      <div class="flabel">כיוונים</div>
+      <div class="chips" id="f-dirs"></div>
+    </div>
+    <div class="fsect">
+      <div class="flabel">בניין</div>
+      <input class="finput" id="f-building" placeholder="הקלד שם בניין...">
+    </div>
+    <div class="fsect">
+      <div class="flabel">קומה</div>
+      <input class="finput" id="f-floor" placeholder="הקלד קומה...">
+    </div>
+    <div class="fsect">
+      <div class="flabel">שנת מכירה</div>
+      <input class="finput" id="f-year" placeholder="2024 2025">
+    </div>
+    <div class="fsect">
+      <div class="flabel">רבעון</div>
+      <div class="chips" id="f-quarters">
+        <button class="chip" data-q="1" onclick="toggleQuarter(this)">Q1 (ינו–מרץ)</button>
+        <button class="chip" data-q="2" onclick="toggleQuarter(this)">Q2 (אפר–יוני)</button>
+        <button class="chip" data-q="3" onclick="toggleQuarter(this)">Q3 (יול–ספט)</button>
+        <button class="chip" data-q="4" onclick="toggleQuarter(this)">Q4 (אוק–דצמ)</button>
+      </div>
+    </div>
+    <div class="fsect">
+      <div class="flabel">רוכש / שם חופשי</div>
+      <input class="finput" id="f-buyer" placeholder="שם רוכש...">
+    </div>
+    <div class="factions">
+      <button class="btn-clear" onclick="clearFilters()">נקה הכל</button>
+      <button class="btn-apply" onclick="applyFilters()">החל סינון</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const SHEET_ID = '1c7WBFvyJ7hiPqFS0v_E0dRLVaUSKSa0Io0vHyXRUDHk';
+const RELEVANT_SHEETS = ['הורדים - נכסים','רובע אילון שלב א - נכסים','רובע הדר (אוסישקין 9-11)','הרימון'];
+const DISPLAY_NAMES = {
+  'הורדים - נכסים':'הורדים',
+  'רובע אילון שלב א - נכסים':'רובע אילון שלב א',
+  'רובע הדר (אוסישקין 9-11)':'רובע הדר',
+  'הרימון':'הרימון'
+};
+
+// row ranges per project: headerRow = row with column names (1-based), dataStart/dataEnd = actual data rows
+let SHEET_RANGES = JSON.parse(localStorage.getItem('mtz_ranges') || 'null') || {
+  'הורדים - נכסים':            { headerRow: 2, dataStart: 3,   dataEnd: 130 },
+  'רובע אילון שלב א - נכסים': { headerRow: 1, dataStart: 2,   dataEnd: 577 },
+  'רובע הדר (אוסישקין 9-11)': { headerRow: 1, dataStart: 2,   dataEnd: 83  },
+  'הרימון':                     { headerRow: 1, dataStart: 2,   dataEnd: 109 }
+};
+function saveRanges() { localStorage.setItem('mtz_ranges', JSON.stringify(SHEET_RANGES)); }
+
+const STATUS = {
+  SOLD: 'חתום',
+  REQ: 'בקשת רכישה',
+  LAND: 'ב.קרקע',
+  LAND2: 'ב.קרקע משלב ב',
+  RENT: 'השכרה',
+  AVAIL: 'למכירה'
+};
+
+// Columns (0-indexed) — mapped to actual sheet headers:
+// 0  מספר או שם בנין
+// 1  מספר דירה
+// 2  שם הדגם
+// 3  קומה
+// 4  סוג הדגם
+// 5  דוח אפס עדכני
+// 6  מחיר PreSale
+// 7  מחיר הדירה (מחירון כולל מע"מ)
+// 8  מחיר למ"ר
+// 9  מכירה בפועל  ← הכנסות בפועל
+// 10 שטח הדירה
+// 11 מספר חדרים
+// 12 מספר חדרי אמבטיה
+// 13 מספר חדרי שירותים
+// 14 שטח מרפסות (כללי)
+// 15 מרפסת צידית מקורה
+// 16 מרפסת גג/שטח מרוצף
+// 17 שטח גינה
+// 18 מ"ר משוכלל
+// 19 כיוונים
+// 20 רוכשים/בעלי קרקע
+// 21 סטטוס
+// 22 מס' חניה
+// 23 מס' מחסן
+// 24 שטח מחסן
+// 25 תאריך בקשת רכישה
+// 26 צפי תאריך חתימה
+// 27 תאריך חתימת הסכם
+const COL = {
+  BUILDING: 0, APT: 1, MODEL: 2, FLOOR: 3,
+  APT_TYPE: 4,
+  PRICE_ZERO: 5,
+  PRICE_PRESALE: 6,
+  PRICE_LIST: 7,
+  PRICE_PER_SQM: 8,
+  PRICE_SALE: 9,
+  AREA: 10, ROOMS: 11,
+  BATH: 12, TOILET: 13,
+  BALCONY: 14, BALCONY_SIDE: 15, BALCONY_ROOF: 16,
+  GARDEN: 17, SQM_W: 18,
+  DIRS: 19, BUYERS: 20, STATUS: 21,
+  PARKING: 22, STORAGE: 23, STORAGE_AREA: 24,
+  DATE_REQ: 25, DATE_SIGN_EXP: 26, DATE_SIGN: 27
+};
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let API_KEY = localStorage.getItem('mtz_key') || '';
+let allData = {}; // sheetName -> [{...}]
+let activeProject = null;
+let activeBuilding = null;
+let currentRoomFilter = 'all';
+let knownSheets = JSON.parse(localStorage.getItem('mtz_known') || '[]');
+let ignoredSheets = JSON.parse(localStorage.getItem('mtz_ignored') || '[]');
+let activeProjects = JSON.parse(localStorage.getItem('mtz_active_projects') || 'null');
+if (!activeProjects) activeProjects = [...RELEVANT_SHEETS];
+
+let filters = {projects:[], status:[], rooms:[], dirs:[], building:'', floor:'', year:'', buyer:'', quarters:[]};
+
+function toggleQuarter(el) {
+  const q = el.dataset.q;
+  el.classList.toggle('on');
+  const idx = filters.quarters.indexOf(q);
+  if (idx > -1) filters.quarters.splice(idx,1); else filters.quarters.push(q);
+  updateFilterCount();
+}
+
+// ═══════════════════════════════════════
+// SCREEN NAV
+// ═══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome() {
+  document.getElementById('g-search').value = '';
+  showScreen('s-home');
+}
+
+// ═══════════════════════════════════════
+// CONNECT
+// ═══════════════════════════════════════
+document.getElementById('btn-connect').onclick = async () => {
+  const key = document.getElementById('inp-key').value.trim();
+  if (!key) {
+    document.getElementById('setup-err').textContent = 'יש להזין API Key';
+    return;
+  }
+  API_KEY = key;
+  localStorage.setItem('mtz_key', key);
+  const errEl = document.getElementById('setup-err');
+  const btn   = document.getElementById('btn-connect');
+  errEl.textContent = '';
+  btn.textContent = 'מתחבר...';
+  btn.disabled = true;
+
+  try {
+    // Step 1: test basic API connectivity
+    errEl.style.color = '#888';
+    errEl.textContent = 'בודק חיבור ל-API...';
+    const testUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=spreadsheetId,properties.title`;
+    const testRes = await fetch(testUrl);
+    if (!testRes.ok) {
+      const errData = await testRes.json();
+      const msg = errData.error?.message || testRes.statusText;
+      const status = testRes.status;
+      if (status === 400) throw new Error('API Key לא תקין. בדוק שהמפתח הועתק נכון.');
+      if (status === 403) throw new Error('אין הרשאה. וודא: (1) Google Sheets API מופעל, (2) הגיליון שותף לצפייה.');
+      if (status === 404) throw new Error('הגיליון לא נמצא. בדוק את ה-Sheet ID.');
+      throw new Error(`שגיאה ${status}: ${msg}`);
+    }
+    const sheetInfo = await testRes.json();
+    errEl.textContent = `✓ מחובר ל: "${sheetInfo.properties?.title || 'גיליון'}" — טוען נתונים...`;
+
+    // Step 2: load all data
+    await loadAllData();
+    errEl.style.color = '';
+    errEl.textContent = '';
+    showScreen('s-home');
+  } catch(e) {
+    errEl.style.color = '#c0392b';
+    errEl.textContent = '⚠️ ' + e.message;
+  }
+  btn.textContent = 'התחבר';
+  btn.disabled = false;
+};
+
+// ═══════════════════════════════════════
+// FETCH
+// ═══════════════════════════════════════
+async function fetchSheet(name) {
+  const range = SHEET_RANGES[name];
+  let rangeStr;
+  if (range) {
+    // fetch header row separately, then data rows
+    rangeStr = `${encodeURIComponent(name)}!A${range.dataStart}:AZ${range.dataEnd}`;
+    const headerRange = `${encodeURIComponent(name)}!A${range.headerRow}:AZ${range.headerRow}`;
+    const [headerRes, dataRes] = await Promise.all([
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${headerRange}?key=${API_KEY}`),
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${rangeStr}?key=${API_KEY}`)
+    ]);
+    if (!headerRes.ok) { const e=await headerRes.json(); throw new Error(e.error?.message||'שגיאה'); }
+    if (!dataRes.ok)   { const e=await dataRes.json();   throw new Error(e.error?.message||'שגיאה'); }
+    const headers = ((await headerRes.json()).values || [[]])[0];
+    const data    = (await dataRes.json()).values || [];
+    return [headers, ...data];
+  } else {
+    // fallback: fetch all
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(name)}?key=${API_KEY}`;
+    const r = await fetch(url);
+    if (!r.ok) { const e=await r.json(); throw new Error(e.error?.message||'שגיאה'); }
+    return (await r.json()).values || [];
+  }
+}
+
+async function fetchAllSheetNames() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=sheets.properties.title`;
+  const r = await fetch(url);
+  if (!r.ok) { const e=await r.json(); throw new Error(e.error?.message||'שגיאה'); }
+  return (await r.json()).sheets.map(s => s.properties.title);
+}
+
+function parseRows(values, sheetName) {
+  if (!values || values.length < 2) return [];
+  const headers = values[0];
+  return values.slice(1).map(row => {
+    const o = { _sheet: sheetName };
+    headers.forEach((h,i) => { o[h] = (row[i]||'').toString().trim(); });
+    // map by position too
+    row.forEach((v,i) => { o['_c'+i] = v ? v.toString().trim() : ''; });
+    return o;
+  }).filter(r => r['_c'+COL.APT] || r['_c'+COL.STATUS]);
+}
+
+function getVal(row, colIdx) { return row['_c'+colIdx] || ''; }
+
+function parsePrice(v) {
+  if (!v) return 0;
+  return parseFloat(v.replace(/[^\d.]/g,'')) || 0;
+}
+
+function fmtPrice(n) {
+  if (!n) return '—';
+  if (n >= 1000000) return '₪' + (n/1000000).toFixed(2) + 'M';
+  return '₪' + Math.round(n).toLocaleString('he-IL');
+}
+
+async function loadAllData() {
+  allData = {};
+  const allNames = await fetchAllSheetNames();
+  // check for new sheets
+  const newSheets = allNames.filter(n => !RELEVANT_SHEETS.includes(n) && !knownSheets.includes(n) && !ignoredSheets.includes(n));
+  newSheets.forEach(n => { if (!knownSheets.includes(n)) knownSheets.push(n); });
+  localStorage.setItem('mtz_known', JSON.stringify(knownSheets));
+
+  for (const name of activeProjects) {
+    if (!allNames.includes(name)) {
+      console.warn(`Sheet "${name}" not found in spreadsheet`);
+      continue;
+    }
+    try {
+      const vals = await fetchSheet(name);
+      allData[name] = parseRows(vals, name);
+      console.log(`Loaded "${name}": ${allData[name].length} rows`);
+    } catch(e) {
+      console.error(`Failed to load "${name}":`, e.message);
+    }
+  }
+  renderHome();
+  checkNewSheets(newSheets.filter(n => !ignoredSheets.includes(n)));
+}
+
+// ═══════════════════════════════════════
+// NEW SHEET DETECTION
+// ═══════════════════════════════════════
+function checkNewSheets(newOnes) {
+  const cont = document.getElementById('new-banners');
+  cont.innerHTML = '';
+  newOnes.forEach(name => {
+    const div = document.createElement('div');
+    div.className = 'new-banner';
+    div.innerHTML = `<span class="nb-text">לשונית חדשה זוהתה: <b>${name}</b> — להוסיף כפרויקט?</span>
+      <button class="nb-btn nb-yes" onclick="addProject('${name}',this.parentElement)">כן</button>
+      <button class="nb-btn nb-no" onclick="ignoreSheet('${name}',this.parentElement)">לא</button>`;
+    cont.appendChild(div);
+  });
+}
+
+async function addProject(name, el) {
+  // ask for row range before adding
+  el.innerHTML = `
+    <span class="nb-text"><b>${name}</b> — הגדר טווח שורות:</span>
+    <span style="font-size:12px;color:#fff;margin-left:6px;">שורת כותרות:</span>
+    <input id="nr-hdr-${name.replace(/\s/g,'_')}" type="number" value="1" style="width:44px;border-radius:6px;border:none;padding:4px 6px;font-size:13px;text-align:center;">
+    <span style="font-size:12px;color:#fff;margin-left:6px;">נתונים משורה:</span>
+    <input id="nr-start-${name.replace(/\s/g,'_')}" type="number" value="2" style="width:44px;border-radius:6px;border:none;padding:4px 6px;font-size:13px;text-align:center;">
+    <span style="font-size:12px;color:#fff;margin-left:6px;">עד שורה:</span>
+    <input id="nr-end-${name.replace(/\s/g,'_')}" type="number" value="200" style="width:54px;border-radius:6px;border:none;padding:4px 6px;font-size:13px;text-align:center;">
+    <button class="nb-btn nb-yes" onclick="confirmAddProject('${name}',this.parentElement)">אישור</button>
+    <button class="nb-btn nb-no" onclick="ignoreSheet('${name}',this.parentElement)">ביטול</button>`;
+}
+
+async function confirmAddProject(name, el) {
+  const key = name.replace(/\s/g,'_');
+  const headerRow = parseInt(document.getElementById('nr-hdr-'+key).value) || 1;
+  const dataStart = parseInt(document.getElementById('nr-start-'+key).value) || 2;
+  const dataEnd   = parseInt(document.getElementById('nr-end-'+key).value) || 200;
+  SHEET_RANGES[name] = { headerRow, dataStart, dataEnd };
+  saveRanges();
+  activeProjects.push(name);
+  localStorage.setItem('mtz_active_projects', JSON.stringify(activeProjects));
+  el.remove();
+  const vals = await fetchSheet(name);
+  allData[name] = parseRows(vals, name);
+  renderHome();
+}
+
+function ignoreSheet(name, el) {
+  ignoredSheets.push(name);
+  localStorage.setItem('mtz_ignored', JSON.stringify(ignoredSheets));
+  el.remove();
+}
+
+// ═══════════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════════
+function getStatus(row) { return getVal(row, COL.STATUS); }
+
+function isSold(row) { return getStatus(row) === STATUS.SOLD; }
+function isReq(row) { return getStatus(row) === STATUS.REQ; }
+function isLand(row) { return getStatus(row) === STATUS.LAND; }
+function isLand2(row) { return getStatus(row) === STATUS.LAND2; }
+function isRent(row) { return getStatus(row) === STATUS.RENT; }
+function isAvail(row) { return getStatus(row) === STATUS.AVAIL; }
+function isForSale(row) { return !isLand(row) && !isLand2(row) && !isRent(row); }
+
+function projectStats(rows) {
+  const forSale = rows.filter(isForSale);
+  const sold = rows.filter(isSold);
+  const req = rows.filter(isReq);
+  const avail = rows.filter(isAvail);
+  const pct = forSale.length ? Math.round(sold.length / forSale.length * 100) : 0;
+  const curYear = new Date().getFullYear().toString();
+  const soldThisYear = sold.filter(r => {
+    const d = getVal(r, COL.DATE_SIGN) || getVal(r, COL.DATE_SIGN_EXP);
+    return d.includes(curYear);
+  }).length;
+  let revenue = 0;
+  sold.forEach(r => { revenue += parsePrice(getVal(r, COL.PRICE_SALE)); });
+  return { total: rows.length, forSale: forSale.length, sold: sold.length, req: req.length, avail: avail.length, pct, soldThisYear, revenue };
+}
+
+function buildingStats(rows) {
+  const buildings = {};
+  rows.forEach(r => {
+    const b = getVal(r, COL.BUILDING) || 'כללי';
+    if (!buildings[b]) buildings[b] = [];
+    buildings[b].push(r);
+  });
+  return buildings;
+}
+
+function statusClass(row) {
+  if (isSold(row)) return 'apt-sold';
+  if (isReq(row)) return 'apt-req';
+  if (isLand2(row)) return 'apt-land2';
+  if (isLand(row)) return 'apt-land';
+  if (isRent(row)) return 'apt-land';
+  return 'apt-avail';
+}
+
+function statusBadgeClass(row) {
+  if (isSold(row)) return 'sb-sold';
+  if (isReq(row)) return 'sb-req';
+  if (isLand2(row)) return 'sb-land2';
+  if (isLand(row)) return 'sb-land';
+  return 'sb-avail';
+}
+
+function tagClass(row) {
+  if (isSold(row)) return 'tag-sold';
+  if (isReq(row)) return 'tag-req';
+  if (isLand2(row)) return 'tag-land2';
+  if (isLand(row)) return 'tag-land';
+  return 'tag-avail';
+}
+
+// ═══════════════════════════════════════
+// RENDER HOME
+// ═══════════════════════════════════════
+function renderHome() {
+  const body = document.getElementById('home-body');
+  body.innerHTML = '';
+  if (!Object.keys(allData).length) {
+    body.innerHTML = '<div class="empty-wrap"><div class="empty-icon">📂</div><div class="empty-text">אין פרויקטים לטעינה</div></div>';
+    return;
+  }
+  activeProjects.forEach(name => {
+    const rows = allData[name];
+    if (!rows) return;
+    const st = projectStats(rows);
+    const dname = DISPLAY_NAMES[name] || name;
+    const dash = Math.round(st.pct * 113 / 100);
+    const card = document.createElement('div');
+    card.className = 'proj-card';
+    card.innerHTML = `
+      <div class="pc-head">
+        <div style="flex:1">
+          <div class="pc-name">${dname}</div>
+          <div class="pc-sub">${st.total} יח"ד סה"כ · ${st.forSale} למכירה</div>
+          <div style="margin-top:8px;background:rgba(255,255,255,0.1);border-radius:8px;padding:7px 10px;display:inline-block;">
+            <div style="font-size:10px;color:rgba(255,255,255,.55);">הכנסות ממכירות</div>
+            <div style="font-size:16px;font-weight:700;color:var(--gold-light);">${fmtPrice(st.revenue)}</div>
+          </div>
+        </div>
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="19" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="4"/>
+            <circle cx="24" cy="24" r="19" fill="none" stroke="${'#b8943a'}" stroke-width="4"
+              stroke-dasharray="${dash} 119" stroke-linecap="round" transform="rotate(-90 24 24)"/>
+          </svg>
+          <div class="ring-pct">${st.pct}%</div>
+          <div class="ring-lbl">נמכר</div>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-stat"><div class="pc-val" style="color:var(--green)">${st.sold}</div><div class="pc-lbl">חתומים</div></div>
+        <div class="pc-stat"><div class="pc-val" style="color:var(--orange)">${st.req}</div><div class="pc-lbl">בקשות רכישה</div></div>
+        <div class="pc-stat"><div class="pc-val" style="color:var(--blue-dark)">${st.avail}</div><div class="pc-lbl">נותר למכירה</div></div>
+      </div>
+      <div class="pc-foot"><span>לחץ לפרטי הפרויקט</span><span>◀</span></div>`;
+    card.onclick = () => openProject(name);
+    body.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════
+// PROJECT PAGE
+// ═══════════════════════════════════════
+let projRoomFilter = 'all';
+
+function openProject(name) {
+  activeProject = name;
+  projRoomFilter = 'all';
+  const dname = DISPLAY_NAMES[name] || name;
+  document.getElementById('proj-title').textContent = dname;
+  showScreen('s-project');
+  renderProjectPage(name);
+}
+
+function renderProjectPage(name) {
+  const rows = allData[name];
+  const buildings = buildingStats(rows);
+  const body = document.getElementById('proj-body');
+  body.innerHTML = '';
+
+  // room filter bar
+  const roomSet = new Set();
+  rows.forEach(r => { const rm = getVal(r,COL.ROOMS); if(rm) roomSet.add(rm); });
+  const roomsSorted = [...roomSet].sort((a,b) => parseFloat(a)-parseFloat(b));
+
+  const filterBar = document.createElement('div');
+  filterBar.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;';
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'rf-chip' + (projRoomFilter==='all'?' on':'');
+  allBtn.textContent = 'כל הדירות';
+  allBtn.onclick = () => { projRoomFilter='all'; renderProjectPage(name); };
+  filterBar.appendChild(allBtn);
+
+  roomsSorted.forEach(rm => {
+    const btn = document.createElement('button');
+    btn.className = 'rf-chip' + (projRoomFilter===rm?' on':'');
+    btn.textContent = rm + " חד'";
+    btn.onclick = () => { projRoomFilter=rm; renderProjectPage(name); };
+    filterBar.appendChild(btn);
+  });
+  body.appendChild(filterBar);
+
+  document.getElementById('proj-sub').textContent = `${Object.keys(buildings).length} בניינים · ${rows.length} יח"ד`;
+
+  Object.entries(buildings).forEach(([bldName, brows]) => {
+    // apply room filter
+    const filtered = projRoomFilter === 'all' ? brows : brows.filter(r => getVal(r,COL.ROOMS) === projRoomFilter);
+    const allBrows = brows;
+
+    const sold  = filtered.filter(isSold).length;
+    const req   = filtered.filter(isReq).length;
+    const land  = filtered.filter(isLand).length;
+    const land2 = filtered.filter(isLand2).length;
+    const avail = filtered.filter(isAvail).length;
+    const forSale = filtered.filter(isForSale).length;
+    const pct   = forSale ? Math.round(sold / forSale * 100) : 0;
+    const total = filtered.length;
+
+    if (total === 0) return; // hide buildings with no matching rooms when filtered
+
+    const card = document.createElement('div');
+    card.className = 'bld-card';
+
+    const filterLabel = projRoomFilter !== 'all'
+      ? `<span style="font-size:11px;color:var(--gold-light);margin-right:8px;">${projRoomFilter} חד' בלבד</span>` : '';
+
+    card.innerHTML = `
+      <div class="bld-head">
+        <div class="bld-name">${bldName}${filterLabel}</div>
+        <div class="bld-pct">${pct}% נמכר</div>
+      </div>
+      <div class="bld-stats">
+        <div class="bs"><div class="bs-val c-dark">${total}</div><div class="bs-lbl">${projRoomFilter!=='all'?projRoomFilter+' חד' – ':''}סה"כ</div></div>
+        <div class="bs"><div class="bs-val c-green">${sold}</div><div class="bs-lbl">חתומים</div></div>
+        <div class="bs"><div class="bs-val c-orange">${req}</div><div class="bs-lbl">בקשות רכישה</div></div>
+        <div class="bs"><div class="bs-val c-blue">${land}</div><div class="bs-lbl">ב.קרקע</div></div>
+        <div class="bs"><div class="bs-val c-red">${land2}</div><div class="bs-lbl">ב.קרקע שלב ב</div></div>
+        <div class="bs"><div class="bs-val c-dark">${avail}</div><div class="bs-lbl">נותר למכירה</div></div>
+      </div>`;
+    card.onclick = () => openBuilding(name, bldName, allBrows);
+    body.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════
+// BUILDING PAGE
+// ═══════════════════════════════════════
+// כיוונים כפי שכתובים בגיליון (ללא מקפים, ייתכן פסיק בין כיוונים מרובים)
+// הפונקציה normalizeDir מנרמלת את הערך לצורך השוואה
+const DIR_ORDER = ['צפון מערב','צפון מזרח','דרום מערב','דרום מזרח','צפון','דרום','מזרח','מערב'];
+
+// נרמול כיוון: מסיר מקפים, חותך רווחים, lowercase-ish
+function normalizeDir(d) {
+  return (d||'').replace(/-/g,' ').replace(/\s+/,' ').trim();
+}
+
+// מחזיר רשימת כיוונים עבור דירה (יכולה להיות מרובים מופרדים בפסיק)
+function getDirs(row) {
+  const raw = (getVal(row, COL.DIRS)||'').trim();
+  if (!raw) return [''];
+  return raw.split(/[,،،]/).map(d => normalizeDir(d)).filter(Boolean);
+}
+
+function openBuilding(projName, bldName, rows) {
+  activeBuilding = { projName, bldName, rows };
+  currentRoomFilter = 'all';
+  document.getElementById('bld-title').textContent = bldName;
+  document.getElementById('bld-sub').textContent = (DISPLAY_NAMES[projName]||projName) + ' · ' + rows.length + ' יח"ד';
+  showScreen('s-building');
+  buildRoomFilter(rows);
+  renderBuildingGrid(rows);
+}
+
+function buildRoomFilter(rows) {
+  const roomSet = new Set();
+  rows.forEach(r => { const rm = getVal(r,COL.ROOMS); if(rm) roomSet.add(rm); });
+  const sorted = [...roomSet].sort((a,b) => parseFloat(a)-parseFloat(b));
+  const bar = document.getElementById('room-filter-bar');
+  bar.innerHTML = '';
+  const all = document.createElement('button');
+  all.className = 'rf-chip on'; all.textContent = 'הכל';
+  all.onclick = () => setRoomFilter('all', all);
+  bar.appendChild(all);
+  sorted.forEach(rm => {
+    const btn = document.createElement('button');
+    btn.className = 'rf-chip';
+    btn.textContent = rm + " חד'";
+    btn.onclick = () => setRoomFilter(rm, btn);
+    bar.appendChild(btn);
+  });
+}
+
+function setRoomFilter(val, el) {
+  currentRoomFilter = val;
+  document.querySelectorAll('.rf-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderBuildingGrid(activeBuilding.rows);
+}
+
+function renderBuildingGrid(rows) {
+  const grid = document.getElementById('bld-grid');
+  grid.innerHTML = '';
+
+  // ── 1. אסוף כל כיוונים קיימים (מנורמלים) ─────────────────
+  const dirSet = new Set();
+  rows.forEach(r => {
+    getDirs(r).forEach(d => dirSet.add(d));
+  });
+  // סדר לפי DIR_ORDER, שאר כיוונים בסוף
+  const dirs = [
+    ...DIR_ORDER.filter(d => dirSet.has(d)),
+    ...[...dirSet].filter(d => !DIR_ORDER.includes(d) && d !== '')
+  ];
+  const hasEmpty = dirSet.has('');
+  if (hasEmpty || dirs.length === 0) dirs.push('');
+
+  // ── 2. בנה מפת קומות: floorMap[fl][dir] = [rows] ──────────
+  const floorMap = {};
+  rows.forEach(r => {
+    const fl = (getVal(r, COL.FLOOR)||'').trim() || '0';
+    if (!floorMap[fl]) floorMap[fl] = {};
+    dirs.forEach(d => { if (!floorMap[fl][d]) floorMap[fl][d] = []; });
+    const rowDirs = getDirs(r);
+    // דירה עם כיוון יחיד — שים בעמודה שלה
+    // דירה עם מספר כיוונים — שים בעמודה הראשונה שמופיעה
+    const targetDir = rowDirs.find(d => dirs.includes(d)) || '';
+    if (!floorMap[fl][targetDir]) floorMap[fl][targetDir] = [];
+    floorMap[fl][targetDir].push(r);
+  });
+
+  // ── 3. מיין קומות מהגבוהה לנמוכה ──────────────────────────
+  const floors = Object.keys(floorMap).sort((a, b) => {
+    const na = parseFloat(a), nb = parseFloat(b);
+    if (!isNaN(na) && !isNaN(nb)) return nb - na;
+    return b.localeCompare(a, 'he');
+  });
+
+  // ── 4. MAX דירות לכל כיוון (קובע רוחב עמודה) ──────────────
+  const maxPerDir = {};
+  dirs.forEach(d => {
+    maxPerDir[d] = Math.max(1, ...floors.map(fl => (floorMap[fl][d]||[]).length));
+  });
+
+  // ── 5. כותרות כיוונים ──────────────────────────────────────
+  if (dirs.filter(d=>d).length > 0) {
+    const hdrRow = document.createElement('div');
+    hdrRow.style.cssText = 'display:flex;gap:4px;margin-bottom:6px;padding-right:28px;';
+    dirs.forEach(d => {
+      const h = document.createElement('div');
+      h.className = 'dir-h';
+      h.style.flex = maxPerDir[d];
+      h.textContent = d || 'ללא כיוון';
+      hdrRow.appendChild(h);
+    });
+    grid.appendChild(hdrRow);
+  }
+
+  // ── 6. שורות קומה ──────────────────────────────────────────
+  floors.forEach(fl => {
+    const flRow = document.createElement('div');
+    flRow.className = 'floor-row';
+
+    const tag = document.createElement('div');
+    tag.className = 'floor-tag';
+    tag.textContent = fl;
+    flRow.appendChild(tag);
+
+    const aptsWrap = document.createElement('div');
+    aptsWrap.className = 'floor-apts';
+
+    dirs.forEach(d => {
+      const apts    = floorMap[fl][d] || [];
+      const colSpan = maxPerDir[d];
+      const dirWrap = document.createElement('div');
+      dirWrap.style.cssText = `flex:${colSpan};display:flex;gap:4px;min-width:0;`;
+
+      if (apts.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'apt-cell apt-empty';
+        empty.style.flex = '1';
+        dirWrap.appendChild(empty);
+      } else {
+        // ריווח שווה: כל דירה תופסת flex=colSpan/actual
+        const flexVal = colSpan / apts.length;
+        apts.forEach(r => {
+          const rooms = getVal(r, COL.ROOMS);
+          const faded = currentRoomFilter !== 'all' && rooms !== currentRoomFilter;
+          const sc    = statusClass(r);
+          const cell  = document.createElement('div');
+          cell.className = 'apt-cell ' + sc + (faded ? ' apt-faded' : '');
+          cell.style.flex = flexVal;
+          const aptDirs = getDirs(r).filter(x=>x).join(',');
+          cell.innerHTML = `<div class="apt-num">${getVal(r, COL.APT)}</div>
+            <div class="apt-dir-lbl">${aptDirs ? shortenDir(aptDirs) : ''}</div>
+            <div class="apt-rooms-lbl">${rooms ? rooms + " חד'" : ''}</div>`;
+          cell.onclick = () => openAptModal(r);
+          dirWrap.appendChild(cell);
+        });
+      }
+      aptsWrap.appendChild(dirWrap);
+    });
+
+    flRow.appendChild(aptsWrap);
+    grid.appendChild(flRow);
+  });
+}
+
+
+
+function shortenDir(d) {
+  if (!d) return '';
+  // handle comma-separated multi-dirs
+  return d.split(/[,،]/).map(p => {
+    const t = normalizeDir(p);
+    return t.replace('צפון מערב','צ-מע').replace('צפון מזרח','צ-מז')
+            .replace('דרום מערב','ד-מע').replace('דרום מזרח','ד-מז')
+            .replace('צפון','צ').replace('דרום','ד')
+            .replace('מזרח','מז').replace('מערב','מע');
+  }).join(',');
+}
+
+// ═══════════════════════════════════════
+// APT MODAL
+// ═══════════════════════════════════════
+function openAptModal(row) {
+  const aptNum = getVal(row, COL.APT);
+  const projName = DISPLAY_NAMES[row._sheet] || row._sheet;
+  const bld = getVal(row, COL.BUILDING);
+  const fl = getVal(row, COL.FLOOR);
+  const status = getStatus(row);
+  const bc = statusBadgeClass(row);
+
+  document.getElementById('m-apt-n').textContent = 'דירה ' + aptNum;
+  document.getElementById('m-proj').textContent = projName + (bld?' · '+bld:'') + (fl?' · קומה '+fl:'');
+  const sb = document.getElementById('m-status');
+  sb.textContent = status; sb.className = 'status-badge ' + bc;
+
+  const v = k => getVal(row, k);
+  const fields = [
+    ['סוג נכס',     v(COL.APT_TYPE)],
+    ['דגם',         v(COL.MODEL)],
+    ['חדרים',       v(COL.ROOMS)],
+    ['חדרי אמבטיה', v(COL.BATH)],
+    ['שטח',         v(COL.AREA)   ? v(COL.AREA)+' מ"ר'          : ''],
+    ['מ"ר משוכלל',  v(COL.SQM_W)  ? v(COL.SQM_W)+' מ"ר'         : ''],
+    ['מרפסת כללי',  v(COL.BALCONY)      ? v(COL.BALCONY)+' מ"ר'       : ''],
+    ['מרפסת צידית', v(COL.BALCONY_SIDE) ? v(COL.BALCONY_SIDE)+' מ"ר'  : ''],
+    ['מרפסת גג',    v(COL.BALCONY_ROOF) ? v(COL.BALCONY_ROOF)+' מ"ר'  : ''],
+    ['שטח גינה',    v(COL.GARDEN)       ? v(COL.GARDEN)+' מ"ר'         : ''],
+    ['כיוונים',     v(COL.DIRS)],
+    ['רוכשים',      v(COL.BUYERS)],
+    ['חניה',        v(COL.PARKING)],
+    ['מחסן',        v(COL.STORAGE) + (v(COL.STORAGE_AREA) ? ' · '+v(COL.STORAGE_AREA)+' מ"ר' : '')],
+    ['ת. בקשת רכישה', v(COL.DATE_REQ)],
+    ['צפי חתימה',   v(COL.DATE_SIGN_EXP)],
+    ['ת. חתימה',    v(COL.DATE_SIGN)],
+  ];
+
+  const priceSale = parsePrice(v(COL.PRICE_SALE));
+  const priceZero = parsePrice(v(COL.PRICE_ZERO));
+  const priceList = parsePrice(v(COL.PRICE_LIST));
+  const pricePresale = parsePrice(v(COL.PRICE_PRESALE));
+
+  let html = fields.filter(([,val])=>val && val.trim() && val !== ' מ"ר' && val !== ' · ').map(([k,val]) =>
+    `<div class="drow"><span class="dk">${k}</span><span class="dv">${val}</span></div>`
+  ).join('');
+
+  if (priceSale)    html += `<div class="price-box"><span class="pk">מכירה בפועל</span><span class="pv">${fmtPrice(priceSale)}</span></div>`;
+  if (priceZero)    html += `<div class="price-zero"><span class="pk">מחיר דוח אפס</span><span class="pv">${fmtPrice(priceZero)}</span></div>`;
+  if (priceList)    html += `<div class="price-zero"><span class="pk">מחיר מחירון</span><span class="pv">${fmtPrice(priceList)}</span></div>`;
+  if (pricePresale) html += `<div class="price-zero"><span class="pk">מחיר PreSale</span><span class="pv">${fmtPrice(pricePresale)}</span></div>`;
+
+  document.getElementById('m-body').innerHTML = html;
+  document.getElementById('apt-modal').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('apt-modal'))
+    document.getElementById('apt-modal').classList.remove('open');
+}
+
+// ═══════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════
+let searchTimer;
+function onSearch(val) {
+  clearTimeout(searchTimer);
+  if (!val.trim()) { showScreen('s-home'); return; }
+  searchTimer = setTimeout(() => runSearch(val.trim()), 300);
+}
+
+function allRows() {
+  const rows = [];
+  activeProjects.forEach(p => { if (allData[p]) rows.push(...allData[p]); });
+  return rows;
+}
+
+function runSearch(q) {
+  const ql = q.toLowerCase();
+  const proj = filters.projects.length ? filters.projects : null;
+  let rows = allRows();
+  if (proj) rows = rows.filter(r => proj.includes(r._sheet));
+
+  const results = rows.filter(r => {
+    const txt = Object.values(r).join(' ').toLowerCase();
+    return txt.includes(ql);
+  });
+  renderSearch(results, q);
+}
+
+function renderSearch(results, q, showRevenue) {
+  const sub = document.getElementById('search-sub');
+  sub.textContent = results.length + ' תוצאות עבור "' + q + '"';
+  const body = document.getElementById('search-body');
+  body.innerHTML = '';
+
+  if (!results.length) {
+    body.innerHTML = '<div class="empty-wrap"><div class="empty-icon">🔍</div><div class="empty-text">לא נמצאו תוצאות</div></div>';
+    showScreen('s-search'); return;
+  }
+
+  // Revenue summary box (only for year/quarter filter)
+  if (showRevenue) {
+    let totalRev = 0;
+    let countWithPrice = 0;
+    results.forEach(r => {
+      const p = parsePrice(getVal(r, COL.PRICE_SALE));
+      if (p) { totalRev += p; countWithPrice++; }
+    });
+
+    const summaryBox = document.createElement('div');
+    summaryBox.style.cssText = `background:var(--blue-dark);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;`;
+    summaryBox.innerHTML = `
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:6px;">סיכום תקופה</div>
+      <div style="display:flex;gap:0;">
+        <div style="flex:1;text-align:center;border-left:0.5px solid rgba(255,255,255,.15);padding:4px 8px;">
+          <div style="font-size:22px;font-weight:700;color:#fff;">${results.length}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);">עסקאות</div>
+        </div>
+        <div style="flex:1;text-align:center;padding:4px 8px;">
+          <div style="font-size:22px;font-weight:700;color:var(--gold-light);">${fmtPrice(totalRev)}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);">סה"כ הכנסות</div>
+        </div>
+        <div style="flex:1;text-align:center;border-right:0.5px solid rgba(255,255,255,.15);padding:4px 8px;">
+          <div style="font-size:22px;font-weight:700;color:#fff;">${countWithPrice ? fmtPrice(totalRev/countWithPrice) : '—'}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);">ממוצע לדירה</div>
+        </div>
+      </div>`;
+    body.appendChild(summaryBox);
+  }
+
+  results.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    const aptNum = getVal(r,COL.APT);
+    const bld    = getVal(r,COL.BUILDING);
+    const fl     = getVal(r,COL.FLOOR);
+    const rooms  = getVal(r,COL.ROOMS);
+    const status = getStatus(r);
+    const tc     = tagClass(r);
+    const price  = parsePrice(getVal(r,COL.PRICE_SALE));
+    const dateSign = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || '';
+
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="result-apt">דירה ${aptNum}${bld?' – '+bld:''}</div>
+          <div class="result-proj">${DISPLAY_NAMES[r._sheet]||r._sheet}${fl?' · קומה '+fl:''}</div>
+        </div>
+        ${showRevenue && price ? `<div style="font-size:15px;font-weight:700;color:var(--blue-dark);">${fmtPrice(price)}</div>` : ''}
+      </div>
+      <div class="result-row" style="margin-top:8px;">
+        <span class="rtag ${tc}">${status}</span>
+        ${rooms?`<span class="rtag tag-avail">${rooms} חד'</span>`:''}
+        ${dateSign?`<span class="rtag tag-avail">📅 ${dateSign}</span>`:''}
+      </div>`;
+    card.onclick = () => openAptModal(r);
+    body.appendChild(card);
+  });
+  showScreen('s-search');
+}
+
+// ═══════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════
+function openFilter() {
+  buildFilterChips();
+  document.getElementById('filter-panel').classList.add('open');
+}
+
+function closeFilterIfOutside(e) {
+  if (e.target === document.getElementById('filter-panel'))
+    document.getElementById('filter-panel').classList.remove('open');
+}
+
+function buildFilterChips() {
+  // projects
+  const fp = document.getElementById('f-projects');
+  fp.innerHTML = '';
+  activeProjects.forEach(p => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (filters.projects.includes(p)?' on':'');
+    c.textContent = DISPLAY_NAMES[p]||p;
+    c.onclick = () => { c.classList.toggle('on'); toggleArr(filters.projects, p); };
+    fp.appendChild(c);
+  });
+
+  // status
+  const fs = document.getElementById('f-status');
+  fs.innerHTML = '';
+  [STATUS.SOLD,STATUS.REQ,STATUS.AVAIL,STATUS.LAND,STATUS.LAND2,STATUS.RENT].forEach(st => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (filters.status.includes(st)?' on':'');
+    c.textContent = st;
+    c.onclick = () => { c.classList.toggle('on'); toggleArr(filters.status, st); };
+    fs.appendChild(c);
+  });
+
+  // rooms
+  const fr = document.getElementById('f-rooms');
+  fr.innerHTML = '';
+  const roomSet = new Set();
+  allRows().forEach(r => { const rm=getVal(r,COL.ROOMS); if(rm) roomSet.add(rm); });
+  [...roomSet].sort((a,b)=>parseFloat(a)-parseFloat(b)).forEach(rm => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (filters.rooms.includes(rm)?' on':'');
+    c.textContent = rm + " חד'";
+    c.onclick = () => { c.classList.toggle('on'); toggleArr(filters.rooms, rm); };
+    fr.appendChild(c);
+  });
+
+  // dirs
+  const fd = document.getElementById('f-dirs');
+  fd.innerHTML = '';
+  DIR_ORDER.filter(d=>d && d!=='').forEach(d => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (filters.dirs.includes(d)?' on':'');
+    c.textContent = d;
+    c.onclick = () => { c.classList.toggle('on'); toggleArr(filters.dirs, d); };
+    fd.appendChild(c);
+  });
+
+  document.getElementById('f-building').value = filters.building;
+  document.getElementById('f-floor').value = filters.floor;
+  document.getElementById('f-year').value = filters.year;
+  document.getElementById('f-buyer').value = filters.buyer;
+}
+
+function toggleArr(arr, val) {
+  const i = arr.indexOf(val);
+  if (i > -1) arr.splice(i,1); else arr.push(val);
+  updateFilterCount();
+}
+
+function updateFilterCount() {
+  const cnt = filters.projects.length + filters.status.length + filters.rooms.length +
+    filters.dirs.length + (filters.building?1:0) + (filters.floor?1:0) +
+    (filters.year?1:0) + (filters.buyer?1:0) + filters.quarters.length;
+  const el = document.getElementById('filter-count');
+  el.textContent = cnt; el.style.display = cnt ? 'inline-block' : 'none';
+}
+
+function clearFilters() {
+  filters = {projects:[],status:[],rooms:[],dirs:[],building:'',floor:'',year:'',buyer:'',quarters:[]};
+  document.querySelectorAll('#f-quarters .chip').forEach(c=>c.classList.remove('on'));
+  buildFilterChips();
+  updateFilterCount();
+}
+
+function applyFilters() {
+  filters.building = document.getElementById('f-building').value.trim();
+  filters.floor = document.getElementById('f-floor').value.trim();
+  filters.year = document.getElementById('f-year').value.trim();
+  filters.buyer = document.getElementById('f-buyer').value.trim();
+  updateFilterCount();
+  document.getElementById('filter-panel').classList.remove('open');
+
+  // run filter search
+  let rows = allRows();
+  if (filters.projects.length) rows = rows.filter(r => filters.projects.includes(r._sheet));
+  if (filters.status.length) rows = rows.filter(r => filters.status.includes(getStatus(r)));
+  if (filters.rooms.length) rows = rows.filter(r => filters.rooms.includes(getVal(r,COL.ROOMS)));
+  if (filters.dirs.length) rows = rows.filter(r => filters.dirs.includes(getVal(r,COL.DIRS).trim()));
+  if (filters.building) rows = rows.filter(r => getVal(r,COL.BUILDING).includes(filters.building));
+  if (filters.floor) rows = rows.filter(r => getVal(r,COL.FLOOR) === filters.floor);
+  if (filters.buyer) rows = rows.filter(r => getVal(r,COL.BUYERS).includes(filters.buyer));
+  if (filters.year) {
+    const years = filters.year.split(/[\s,]+/).map(y=>y.trim()).filter(Boolean);
+    rows = rows.filter(r => {
+      const d = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || getVal(r,COL.DATE_REQ);
+      return years.some(y => d.includes(y));
+    });
+  }
+
+  if (filters.quarters.length) {
+    const MONTH_QUARTER = {
+      '01':1,'02':1,'03':1,'04':2,'05':2,'06':2,
+      '07':3,'08':3,'09':3,'10':4,'11':4,'12':4,
+      '1':1,'2':1,'3':1,'4':2,'5':2,'6':2,
+      '7':3,'8':3,'9':3
+    };
+    rows = rows.filter(r => {
+      const d = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || getVal(r,COL.DATE_REQ);
+      if (!d) return false;
+      // try DD/MM/YYYY or MM/YYYY
+      const parts = d.split(/[\/\-.]/);
+      let month = null;
+      if (parts.length >= 3) month = parts[1]; // DD/MM/YYYY
+      else if (parts.length === 2) month = parts[0]; // MM/YYYY
+      if (!month) return false;
+      const q = MONTH_QUARTER[month.replace(/^0/,'')];
+      return q && filters.quarters.includes(String(q));
+    });
+  }
+
+  const isYearOrQuarterFilter = filters.year || filters.quarters.length;
+  renderSearch(rows, 'סינון פעיל', isYearOrQuarterFilter);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+if (API_KEY) {
+  document.getElementById('inp-key').value = API_KEY;
+  loadAllData().then(() => showScreen('s-home')).catch(() => {});
+}
+</script>
+</body>
+</html>
