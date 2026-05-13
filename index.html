@@ -348,7 +348,16 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
     </div>
     <div class="fsect">
       <div class="flabel">שנת מכירה</div>
-      <input class="finput" id="f-year" placeholder="2024">
+      <input class="finput" id="f-year" placeholder="2024 2025">
+    </div>
+    <div class="fsect">
+      <div class="flabel">רבעון</div>
+      <div class="chips" id="f-quarters">
+        <button class="chip" data-q="1" onclick="toggleQuarter(this)">Q1 (ינו–מרץ)</button>
+        <button class="chip" data-q="2" onclick="toggleQuarter(this)">Q2 (אפר–יוני)</button>
+        <button class="chip" data-q="3" onclick="toggleQuarter(this)">Q3 (יול–ספט)</button>
+        <button class="chip" data-q="4" onclick="toggleQuarter(this)">Q4 (אוק–דצמ)</button>
+      </div>
     </div>
     <div class="fsect">
       <div class="flabel">רוכש / שם חופשי</div>
@@ -441,7 +450,7 @@ const COL = {
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
-let API_KEY = localStorage.getItem('mtz_key') || '';
+let API_KEY = localStorage.getItem('mtz_key') || 'YOUR_API_KEY_HERE';
 let allData = {}; // sheetName -> [{...}]
 let activeProject = null;
 let activeBuilding = null;
@@ -451,7 +460,15 @@ let ignoredSheets = JSON.parse(localStorage.getItem('mtz_ignored') || '[]');
 let activeProjects = JSON.parse(localStorage.getItem('mtz_active_projects') || 'null');
 if (!activeProjects) activeProjects = [...RELEVANT_SHEETS];
 
-let filters = {projects:[], status:[], rooms:[], dirs:[], building:'', floor:'', year:'', buyer:''};
+let filters = {projects:[], status:[], rooms:[], dirs:[], building:'', floor:'', year:'', buyer:'', quarters:[]};
+
+function toggleQuarter(el) {
+  const q = el.dataset.q;
+  el.classList.toggle('on');
+  const idx = filters.quarters.indexOf(q);
+  if (idx > -1) filters.quarters.splice(idx,1); else filters.quarters.push(q);
+  updateFilterCount();
+}
 
 // ═══════════════════════════════════════
 // SCREEN NAV
@@ -471,44 +488,57 @@ function goHome() {
 // ═══════════════════════════════════════
 document.getElementById('btn-connect').onclick = async () => {
   const key = document.getElementById('inp-key').value.trim();
-  if (!key) return;
+  if (!key) { document.getElementById('setup-err').textContent = 'הזן API Key'; return; }
   API_KEY = key;
   localStorage.setItem('mtz_key', key);
-  document.getElementById('setup-err').textContent = '';
-  document.getElementById('btn-connect').textContent = 'מתחבר...';
+  const errEl = document.getElementById('setup-err');
+  const btn   = document.getElementById('btn-connect');
+  errEl.style.color = '#888';
+  btn.textContent = 'שלב 1: בודק חיבור...';
+  btn.disabled = true;
   try {
+    // Step 1: simple test
+    errEl.textContent = 'שלב 1: בודק גישה לגיליון...';
+    const testUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=spreadsheetId`;
+    const testRes = await fetch(testUrl);
+    const testJson = await testRes.json();
+    if (!testRes.ok) throw new Error(`שלב 1 נכשל (${testRes.status}): ${testJson.error?.message}`);
+    errEl.textContent = 'שלב 2: טוען לשוניות...';
+    // Step 2: load data
     await loadAllData();
+    errEl.style.color = '';
+    errEl.textContent = '';
     showScreen('s-home');
   } catch(e) {
-    document.getElementById('setup-err').textContent = 'שגיאה: ' + e.message;
+    errEl.style.color = '#c0392b';
+    errEl.textContent = '⚠️ ' + e.message;
+    console.error('Connect error:', e);
   }
-  document.getElementById('btn-connect').textContent = 'התחבר';
+  btn.textContent = 'התחבר';
+  btn.disabled = false;
 };
 
 // ═══════════════════════════════════════
 // FETCH
 // ═══════════════════════════════════════
 async function fetchSheet(name) {
+  const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
   const range = SHEET_RANGES[name];
-  let rangeStr;
   if (range) {
-    // fetch header row separately, then data rows
-    rangeStr = `${encodeURIComponent(name)}!A${range.dataStart}:AZ${range.dataEnd}`;
-    const headerRange = `${encodeURIComponent(name)}!A${range.headerRow}:AZ${range.headerRow}`;
-    const [headerRes, dataRes] = await Promise.all([
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${headerRange}?key=${API_KEY}`),
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${rangeStr}?key=${API_KEY}`)
-    ]);
-    if (!headerRes.ok) { const e=await headerRes.json(); throw new Error(e.error?.message||'שגיאה'); }
-    if (!dataRes.ok)   { const e=await dataRes.json();   throw new Error(e.error?.message||'שגיאה'); }
-    const headers = ((await headerRes.json()).values || [[]])[0];
-    const data    = (await dataRes.json()).values || [];
+    const hUrl = base + encodeURIComponent(name) + `!A${range.headerRow}:AZ${range.headerRow}` + `?key=${API_KEY}`;
+    const dUrl = base + encodeURIComponent(name) + `!A${range.dataStart}:AZ${range.dataEnd}`   + `?key=${API_KEY}`;
+    const hRes = await fetch(hUrl);
+    if (!hRes.ok) { const e = await hRes.json(); throw new Error(e.error?.message || 'שגיאה'); }
+    const hJson = await hRes.json();
+    const dRes = await fetch(dUrl);
+    if (!dRes.ok) { const e = await dRes.json(); throw new Error(e.error?.message || 'שגיאה'); }
+    const dJson = await dRes.json();
+    const headers = (hJson.values || [[]])[0];
+    const data    = dJson.values || [];
     return [headers, ...data];
   } else {
-    // fallback: fetch all
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(name)}?key=${API_KEY}`;
-    const r = await fetch(url);
-    if (!r.ok) { const e=await r.json(); throw new Error(e.error?.message||'שגיאה'); }
+    const r = await fetch(base + encodeURIComponent(name) + `?key=${API_KEY}`);
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'שגיאה'); }
     return (await r.json()).values || [];
   }
 }
@@ -548,16 +578,21 @@ function fmtPrice(n) {
 async function loadAllData() {
   allData = {};
   const allNames = await fetchAllSheetNames();
-  // check for new sheets
   const newSheets = allNames.filter(n => !RELEVANT_SHEETS.includes(n) && !knownSheets.includes(n) && !ignoredSheets.includes(n));
   newSheets.forEach(n => { if (!knownSheets.includes(n)) knownSheets.push(n); });
   localStorage.setItem('mtz_known', JSON.stringify(knownSheets));
-
   for (const name of activeProjects) {
     if (!allNames.includes(name)) continue;
     const vals = await fetchSheet(name);
     allData[name] = parseRows(vals, name);
   }
+  // DEBUG: log unique status values per sheet
+  Object.entries(allData).forEach(([name, rows]) => {
+    const statuses = [...new Set(rows.map(r => getVal(r, COL.STATUS)))].filter(Boolean);
+    console.log('STATUSES in', name, ':', statuses);
+    const l2 = rows.filter(r => getVal(r,COL.STATUS).includes('שלב'));
+    console.log('  Land2 rows:', l2.length, l2.slice(0,2).map(r=>getVal(r,COL.STATUS)));
+  });
   renderHome();
   checkNewSheets(newSheets.filter(n => !ignoredSheets.includes(n)));
 }
@@ -620,8 +655,20 @@ function getStatus(row) { return getVal(row, COL.STATUS); }
 
 function isSold(row) { return getStatus(row) === STATUS.SOLD; }
 function isReq(row) { return getStatus(row) === STATUS.REQ; }
-function isLand(row) { return getStatus(row) === STATUS.LAND; }
-function isLand2(row) { return getStatus(row) === STATUS.LAND2; }
+function isLand(row) {
+  const s = (getStatus(row) || '').trim();
+  return (s === STATUS.LAND || s === 'ב.קרקע')
+    && !s.includes('שלב');
+}
+function isLand2(row) {
+  const s = (getStatus(row) || '').trim();
+  // match any variation: 'ב.קרקע משלב ב', 'ב.קרקע משלב ב', etc.
+  return s === STATUS.LAND2
+    || s === 'ב.קרקע משלב ב'
+    || s === 'ב.קרקע  משלב ב'
+    || (s.startsWith('ב.קרקע') && s.includes('שלב'))
+    || (s.includes('קרקע') && s.includes('שלב'));
+}
 function isRent(row) { return getStatus(row) === STATUS.RENT; }
 function isAvail(row) { return getStatus(row) === STATUS.AVAIL; }
 function isForSale(row) { return !isLand(row) && !isLand2(row) && !isRent(row); }
@@ -637,7 +684,9 @@ function projectStats(rows) {
     const d = getVal(r, COL.DATE_SIGN) || getVal(r, COL.DATE_SIGN_EXP);
     return d.includes(curYear);
   }).length;
-  return { total: rows.length, forSale: forSale.length, sold: sold.length, req: req.length, avail: avail.length, pct, soldThisYear };
+  let revenue = 0;
+  sold.forEach(r => { revenue += parsePrice(getVal(r, COL.PRICE_SALE)); });
+  return { total: rows.length, forSale: forSale.length, sold: sold.length, req: req.length, avail: avail.length, pct, soldThisYear, revenue };
 }
 
 function buildingStats(rows) {
@@ -695,7 +744,14 @@ function renderHome() {
     card.className = 'proj-card';
     card.innerHTML = `
       <div class="pc-head">
-        <div><div class="pc-name">${dname}</div><div class="pc-sub">${st.total} יח"ד סה"כ · ${st.forSale} למכירה</div></div>
+        <div style="flex:1">
+          <div class="pc-name">${dname}</div>
+          <div class="pc-sub">${st.total} יח"ד סה"כ · ${st.forSale} למכירה</div>
+          <div style="margin-top:8px;background:rgba(255,255,255,0.1);border-radius:8px;padding:7px 10px;display:inline-block;">
+            <div style="font-size:10px;color:rgba(255,255,255,.55);">הכנסות ממכירות</div>
+            <div style="font-size:16px;font-weight:700;color:var(--gold-light);">${fmtPrice(st.revenue)}</div>
+          </div>
+        </div>
         <div class="ring-wrap">
           <svg class="ring-svg" viewBox="0 0 48 48">
             <circle cx="24" cy="24" r="19" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="4"/>
@@ -720,37 +776,85 @@ function renderHome() {
 // ═══════════════════════════════════════
 // PROJECT PAGE
 // ═══════════════════════════════════════
+let projRoomFilter = 'all';
+
 function openProject(name) {
   activeProject = name;
+  projRoomFilter = 'all';
   const dname = DISPLAY_NAMES[name] || name;
   document.getElementById('proj-title').textContent = dname;
   showScreen('s-project');
+  renderProjectPage(name);
+}
+
+function renderProjectPage(name) {
   const rows = allData[name];
   const buildings = buildingStats(rows);
   const body = document.getElementById('proj-body');
   body.innerHTML = '';
+
+  // room filter bar
+  const roomSet = new Set();
+  rows.forEach(r => { const rm = getVal(r,COL.ROOMS); if(rm) roomSet.add(rm); });
+  const roomsSorted = [...roomSet].sort((a,b) => parseFloat(a)-parseFloat(b));
+
+  const filterBar = document.createElement('div');
+  filterBar.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;';
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'rf-chip' + (projRoomFilter==='all'?' on':'');
+  allBtn.textContent = 'כל הדירות';
+  allBtn.onclick = () => { projRoomFilter='all'; renderProjectPage(name); };
+  filterBar.appendChild(allBtn);
+
+  roomsSorted.forEach(rm => {
+    const btn = document.createElement('button');
+    btn.className = 'rf-chip' + (projRoomFilter===rm?' on':'');
+    btn.textContent = rm + " חד'";
+    btn.onclick = () => { projRoomFilter=rm; renderProjectPage(name); };
+    filterBar.appendChild(btn);
+  });
+  body.appendChild(filterBar);
+
+  document.getElementById('proj-sub').textContent = `${Object.keys(buildings).length} בניינים · ${rows.length} יח"ד`;
+
   Object.entries(buildings).forEach(([bldName, brows]) => {
-    const sold = brows.filter(isSold).length;
-    const req = brows.filter(isReq).length;
-    const land = brows.filter(isLand).length;
-    const land2 = brows.filter(isLand2).length;
-    const avail = brows.filter(isAvail).length;
-    const forSale = brows.filter(isForSale).length;
-    const pct = forSale ? Math.round(sold / forSale * 100) : 0;
-    document.getElementById('proj-sub').textContent = `${Object.keys(buildings).length} בניינים · ${rows.length} יח"ד`;
+    // apply room filter
+    const filtered = projRoomFilter === 'all' ? brows : brows.filter(r => getVal(r,COL.ROOMS) === projRoomFilter);
+    const allBrows = brows;
+
+    const sold  = filtered.filter(isSold).length;
+    const req   = filtered.filter(isReq).length;
+    const land  = filtered.filter(isLand).length;
+    const land2 = filtered.filter(isLand2).length;
+    const avail = filtered.filter(isAvail).length;
+    const forSale = filtered.filter(isForSale).length;
+    const pct   = forSale ? Math.round(sold / forSale * 100) : 0;
+    const total = filtered.length;
+
+    if (total === 0) return; // hide buildings with no matching rooms when filtered
+
     const card = document.createElement('div');
     card.className = 'bld-card';
-    card.innerHTML = `
-      <div class="bld-head"><div class="bld-name">${bldName}</div><div class="bld-pct">${pct}% נמכר</div></div>
-      <div class="bld-stats">
-        <div class="bs"><div class="bs-val c-dark">${brows.length}</div><div class="bs-lbl">סה"כ יח"ד</div></div>
-        <div class="bs"><div class="bs-val c-green">${sold}</div><div class="bs-lbl">חתומים</div></div>
-        <div class="bs"><div class="bs-val c-orange">${req}</div><div class="bs-lbl">בקשות רכישה</div></div>
-        <div class="bs"><div class="bs-val c-blue">${land}</div><div class="bs-lbl">ב.קרקע</div></div>
-        <div class="bs"><div class="bs-val c-red">${land2}</div><div class="bs-lbl">ב.קרקע שלב ב</div></div>
-        <div class="bs"><div class="bs-val c-dark">${avail}</div><div class="bs-lbl">נותר למכירה</div></div>
-      </div>`;
-    card.onclick = () => openBuilding(name, bldName, brows);
+
+    const rooms_label = projRoomFilter !== 'all' ? (projRoomFilter + ' חדר') : '';
+    const filterLabel = rooms_label ? '<span style="font-size:11px;color:#d4b05a;margin-right:8px;">' + rooms_label + ' בלבד</span>' : '';
+    const bslbl_total = rooms_label ? (rooms_label + ' – סה"כ') : 'סה"כ';
+
+    card.innerHTML =
+      '<div class="bld-head">' +
+        '<div class="bld-name">' + bldName + filterLabel + '</div>' +
+        '<div class="bld-pct">' + pct + '% נמכר</div>' +
+      '</div>' +
+      '<div class="bld-stats">' +
+        '<div class="bs"><div class="bs-val c-dark">' + total + '</div><div class="bs-lbl">' + bslbl_total + '</div></div>' +
+        '<div class="bs"><div class="bs-val c-green">' + sold + '</div><div class="bs-lbl">חתומים</div></div>' +
+        '<div class="bs"><div class="bs-val c-orange">' + req + '</div><div class="bs-lbl">בקשות רכישה</div></div>' +
+        '<div class="bs"><div class="bs-val c-blue">' + land + '</div><div class="bs-lbl">ב.קרקע</div></div>' +
+        '<div class="bs"><div class="bs-val c-red">' + land2 + '</div><div class="bs-lbl">ב.קרקע שלב ב</div></div>' +
+        '<div class="bs"><div class="bs-val c-dark">' + avail + '</div><div class="bs-lbl">נותר למכירה</div></div>' +
+      '</div>';
+    card.onclick = () => openBuilding(name, bldName, allBrows);
     body.appendChild(card);
   });
 }
@@ -1021,30 +1125,96 @@ function runSearch(q) {
   renderSearch(results, q);
 }
 
-function renderSearch(results, q) {
+function renderSearch(results, q, showRevenue) {
   const sub = document.getElementById('search-sub');
   sub.textContent = results.length + ' תוצאות עבור "' + q + '"';
   const body = document.getElementById('search-body');
   body.innerHTML = '';
+
   if (!results.length) {
     body.innerHTML = '<div class="empty-wrap"><div class="empty-icon">🔍</div><div class="empty-text">לא נמצאו תוצאות</div></div>';
     showScreen('s-search'); return;
   }
+
+  // סיכום סטטוס — תמיד מוצג
+  const statusCounts = {};
+  results.forEach(r => {
+    const s = getStatus(r) || 'לא ידוע';
+    statusCounts[s] = (statusCounts[s]||0) + 1;
+  });
+  const colorMap = {
+    [STATUS.SOLD]:  {bg:'#EAF3DE',cl:'#27500A'},
+    [STATUS.REQ]:   {bg:'#FAEEDA',cl:'#633806'},
+    [STATUS.LAND]:  {bg:'#E6F1FB',cl:'#0C447C'},
+    [STATUS.LAND2]: {bg:'#E6F1FB',cl:'#A32D2D'},
+    [STATUS.RENT]:  {bg:'#fdecea',cl:'#a32d2d'},
+    [STATUS.AVAIL]: {bg:'#f2f5fa',cl:'#1a2540'},
+  };
+  const chips = Object.entries(statusCounts)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([s,n]) => {
+      const c = colorMap[s] || {bg:'#f2f5fa',cl:'#1a2540'};
+      return '<span style="background:'+c.bg+';color:'+c.cl+';border-radius:8px;padding:4px 11px;font-size:13px;font-weight:600;display:inline-block;">'+n+' '+s+'</span>';
+    }).join('');
+  const sumDiv = document.createElement('div');
+  sumDiv.style.cssText = 'background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow);';
+  sumDiv.innerHTML = '<div style="font-size:11px;color:var(--text-sub);margin-bottom:7px;">סה"כ '+results.length+' נכסים</div><div style="display:flex;flex-wrap:wrap;gap:6px;">'+chips+'</div>';
+  body.appendChild(sumDiv);
+
+  // Revenue summary box (only for year/quarter filter)
+  if (showRevenue) {
+    let totalRev = 0;
+    let countWithPrice = 0;
+    results.forEach(r => {
+      const p = parsePrice(getVal(r, COL.PRICE_SALE));
+      if (p) { totalRev += p; countWithPrice++; }
+    });
+
+    const summaryBox = document.createElement('div');
+    summaryBox.style.cssText = `background:var(--blue-dark);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;`;
+    summaryBox.innerHTML = `
+      <div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:6px;">סיכום תקופה</div>
+      <div style="display:flex;gap:0;">
+        <div style="flex:1;text-align:center;border-left:0.5px solid rgba(255,255,255,.15);padding:4px 8px;">
+          <div style="font-size:22px;font-weight:700;color:#fff;">${results.length}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);">עסקאות</div>
+        </div>
+        <div style="flex:1;text-align:center;padding:4px 8px;">
+          <div style="font-size:22px;font-weight:700;color:var(--gold-light);">${fmtPrice(totalRev)}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);">סה"כ הכנסות</div>
+        </div>
+        <div style="flex:1;text-align:center;border-right:0.5px solid rgba(255,255,255,.15);padding:4px 8px;">
+          <div style="font-size:22px;font-weight:700;color:#fff;">${countWithPrice ? fmtPrice(totalRev/countWithPrice) : '—'}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.55);">ממוצע לדירה</div>
+        </div>
+      </div>`;
+    body.appendChild(summaryBox);
+  }
+
   results.forEach(r => {
     const card = document.createElement('div');
     card.className = 'result-card';
     const aptNum = getVal(r,COL.APT);
-    const bld = getVal(r,COL.BUILDING);
-    const fl = getVal(r,COL.FLOOR);
-    const rooms = getVal(r,COL.ROOMS);
+    const bld    = getVal(r,COL.BUILDING);
+    const fl     = getVal(r,COL.FLOOR);
+    const rooms  = getVal(r,COL.ROOMS);
     const status = getStatus(r);
-    const tc = tagClass(r);
+    const tc     = tagClass(r);
+    const price  = parsePrice(getVal(r,COL.PRICE_SALE));
+    const dateSign = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || '';
+
     card.innerHTML = `
-      <div class="result-apt">דירה ${aptNum}${bld?' – '+bld:''}</div>
-      <div class="result-proj">${DISPLAY_NAMES[r._sheet]||r._sheet}${fl?' · קומה '+fl:''}</div>
-      <div class="result-row">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="result-apt">דירה ${aptNum}${bld?' – '+bld:''}</div>
+          <div class="result-proj">${DISPLAY_NAMES[r._sheet]||r._sheet}${fl?' · קומה '+fl:''}</div>
+        </div>
+        ${showRevenue && price ? `<div style="font-size:15px;font-weight:700;color:var(--blue-dark);">${fmtPrice(price)}</div>` : ''}
+      </div>
+      <div class="result-row" style="margin-top:8px;">
         <span class="rtag ${tc}">${status}</span>
-        ${rooms?`<span class="rtag tag-avail">${rooms} חדרים</span>`:''}
+        ${rooms?`<span class="rtag tag-avail">${rooms} חד'</span>`:''}
+        ${dateSign?`<span class="rtag tag-avail">📅 ${dateSign}</span>`:''}
       </div>`;
     card.onclick = () => openAptModal(r);
     body.appendChild(card);
@@ -1127,13 +1297,14 @@ function toggleArr(arr, val) {
 function updateFilterCount() {
   const cnt = filters.projects.length + filters.status.length + filters.rooms.length +
     filters.dirs.length + (filters.building?1:0) + (filters.floor?1:0) +
-    (filters.year?1:0) + (filters.buyer?1:0);
+    (filters.year?1:0) + (filters.buyer?1:0) + filters.quarters.length;
   const el = document.getElementById('filter-count');
   el.textContent = cnt; el.style.display = cnt ? 'inline-block' : 'none';
 }
 
 function clearFilters() {
-  filters = {projects:[],status:[],rooms:[],dirs:[],building:'',floor:'',year:'',buyer:''};
+  filters = {projects:[],status:[],rooms:[],dirs:[],building:'',floor:'',year:'',buyer:'',quarters:[]};
+  document.querySelectorAll('#f-quarters .chip').forEach(c=>c.classList.remove('on'));
   buildFilterChips();
   updateFilterCount();
 }
@@ -1149,18 +1320,54 @@ function applyFilters() {
   // run filter search
   let rows = allRows();
   if (filters.projects.length) rows = rows.filter(r => filters.projects.includes(r._sheet));
-  if (filters.status.length) rows = rows.filter(r => filters.status.includes(getStatus(r)));
+  if (filters.status.length) rows = rows.filter(r => {
+    const s = getStatus(r);
+    return filters.status.some(f => {
+      if (f === STATUS.LAND2) return isLand2(r);
+      if (f === STATUS.LAND)  return isLand(r);
+      if (f === STATUS.SOLD)  return isSold(r);
+      if (f === STATUS.REQ)   return isReq(r);
+      if (f === STATUS.RENT)  return isRent(r);
+      if (f === STATUS.AVAIL) return isAvail(r);
+      return s === f;
+    });
+  });
   if (filters.rooms.length) rows = rows.filter(r => filters.rooms.includes(getVal(r,COL.ROOMS)));
   if (filters.dirs.length) rows = rows.filter(r => filters.dirs.includes(getVal(r,COL.DIRS).trim()));
   if (filters.building) rows = rows.filter(r => getVal(r,COL.BUILDING).includes(filters.building));
   if (filters.floor) rows = rows.filter(r => getVal(r,COL.FLOOR) === filters.floor);
   if (filters.buyer) rows = rows.filter(r => getVal(r,COL.BUYERS).includes(filters.buyer));
-  if (filters.year) rows = rows.filter(r => {
-    const d = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || getVal(r,COL.DATE_REQ);
-    return d.includes(filters.year);
-  });
+  if (filters.year) {
+    const years = filters.year.split(/[\s,]+/).map(y=>y.trim()).filter(Boolean);
+    rows = rows.filter(r => {
+      const d = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || getVal(r,COL.DATE_REQ);
+      return years.some(y => d.includes(y));
+    });
+  }
 
-  renderSearch(rows, 'סינון פעיל');
+  if (filters.quarters.length) {
+    const MONTH_QUARTER = {
+      '01':1,'02':1,'03':1,'04':2,'05':2,'06':2,
+      '07':3,'08':3,'09':3,'10':4,'11':4,'12':4,
+      '1':1,'2':1,'3':1,'4':2,'5':2,'6':2,
+      '7':3,'8':3,'9':3
+    };
+    rows = rows.filter(r => {
+      const d = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || getVal(r,COL.DATE_REQ);
+      if (!d) return false;
+      // try DD/MM/YYYY or MM/YYYY
+      const parts = d.split(/[\/\-.]/);
+      let month = null;
+      if (parts.length >= 3) month = parts[1]; // DD/MM/YYYY
+      else if (parts.length === 2) month = parts[0]; // MM/YYYY
+      if (!month) return false;
+      const q = MONTH_QUARTER[month.replace(/^0/,'')];
+      return q && filters.quarters.includes(String(q));
+    });
+  }
+
+  const isYearOrQuarterFilter = filters.year || filters.quarters.length;
+  renderSearch(rows, 'סינון פעיל', isYearOrQuarterFilter);
 }
 
 // ═══════════════════════════════════════
@@ -1168,7 +1375,7 @@ function applyFilters() {
 // ═══════════════════════════════════════
 if (API_KEY) {
   document.getElementById('inp-key').value = API_KEY;
-  loadAllData().then(() => showScreen('s-home')).catch(() => {});
+  document.getElementById('btn-connect').click();
 }
 </script>
 </body>
