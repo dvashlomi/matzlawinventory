@@ -685,7 +685,7 @@ function projectStats(rows) {
     return d.includes(curYear);
   }).length;
   let revenue = 0;
-  sold.forEach(r => { revenue += parsePrice(getVal(r, COL.PRICE_SALE)); });
+  rows.forEach(r => { revenue += parsePrice(getVal(r, COL.PRICE_SALE)); });
   return { total: rows.length, forSale: forSale.length, sold: sold.length, req: req.length, avail: avail.length, pct, soldThisYear, revenue };
 }
 
