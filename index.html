@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>מצלאוי – ניהול נכסים</title>
+<title>מצלאוי – ניהול נכסים (Master)</title>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -179,13 +179,6 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 .setup-btn:active{opacity:.88;}
 .setup-err{color:#c0392b;font-size:13px;margin-top:12px;text-align:center;}
 
-/* NEW SHEET BANNER */
-.new-banner{background:var(--gold);color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:13px;flex-wrap:wrap;}
-.nb-text{flex:1;}
-.nb-btn{padding:5px 13px;border-radius:8px;font-family:'Assistant',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;}
-.nb-yes{background:#fff;color:var(--gold);}
-.nb-no{background:rgba(255,255,255,.25);color:#fff;}
-
 /* LOADING / EMPTY */
 .loading-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
 .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--blue-mid);border-radius:50%;animation:spin .8s linear infinite;}
@@ -205,7 +198,6 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 </head>
 <body>
 
-<!-- ═══ SETUP ═══ -->
 <div id="s-setup" class="screen active">
   <div class="setup-wrap">
     <div style="width:80px;height:80px;background:var(--blue-dark);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
@@ -226,12 +218,11 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   </div>
 </div>
 
-<!-- ═══ HOME ═══ -->
 <div id="s-home" class="screen">
   <div class="tb">
     <div style="flex:1">
       <div class="tb-title">מצלאוי</div>
-      <div class="tb-sub">יזמות והתחדשות בבנייה</div>
+      <div class="tb-sub">ניהול מלאי ופרויקטים</div>
     </div>
     <button class="tb-btn" onclick="showScreen('s-setup')" title="הגדרות">⚙️</button>
   </div>
@@ -246,13 +237,11 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
       </button>
     </div>
   </div>
-  <div id="new-banners"></div>
   <div class="sbody" id="home-body">
-    <div class="loading-wrap"><div class="spinner"></div><div class="loading-text">טוען פרויקטים...</div></div>
+    <div class="loading-wrap"><div class="spinner"></div><div class="loading-text">טוען פרויקטים מגיליון Master...</div></div>
   </div>
 </div>
 
-<!-- ═══ SEARCH RESULTS ═══ -->
 <div id="s-search" class="screen">
   <div class="tb">
     <button class="tb-btn" onclick="goHome()">🏠</button>
@@ -265,7 +254,6 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   <div class="sbody" id="search-body"></div>
 </div>
 
-<!-- ═══ PROJECT (buildings) ═══ -->
 <div id="s-project" class="screen">
   <div class="tb">
     <button class="tb-btn" onclick="goHome()">🏠</button>
@@ -280,7 +268,6 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   </div>
 </div>
 
-<!-- ═══ BUILDING (apt grid) ═══ -->
 <div id="s-building" class="screen">
   <div class="tb">
     <button class="tb-btn" onclick="goHome()">🏠</button>
@@ -301,7 +288,6 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   <div class="bld-grid-wrap" id="bld-grid"></div>
 </div>
 
-<!-- ═══ APT DETAIL MODAL ═══ -->
 <div class="modal-overlay" id="apt-modal" onclick="closeModal(event)">
   <div class="modal-sheet">
     <span class="modal-handle"></span>
@@ -316,7 +302,6 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   </div>
 </div>
 
-<!-- ═══ FILTER PANEL ═══ -->
 <div class="filter-panel" id="filter-panel" onclick="closeFilterIfOutside(event)">
   <div class="filter-sheet">
     <span class="fhandle"></span>
@@ -375,22 +360,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 // CONFIG
 // ═══════════════════════════════════════
 const SHEET_ID = '1c7WBFvyJ7hiPqFS0v_E0dRLVaUSKSa0Io0vHyXRUDHk';
-const RELEVANT_SHEETS = ['הורדים - נכסים','רובע אילון שלב א - נכסים','רובע הדר (אוסישקין 9-11)','הרימון'];
-const DISPLAY_NAMES = {
-  'הורדים - נכסים':'הורדים',
-  'רובע אילון שלב א - נכסים':'רובע אילון שלב א',
-  'רובע הדר (אוסישקין 9-11)':'רובע הדר',
-  'הרימון':'הרימון'
-};
-
-// row ranges per project: headerRow = row with column names (1-based), dataStart/dataEnd = actual data rows
-let SHEET_RANGES = JSON.parse(localStorage.getItem('mtz_ranges') || 'null') || {
-  'הורדים - נכסים':            { headerRow: 2, dataStart: 3,   dataEnd: 130 },
-  'רובע אילון שלב א - נכסים': { headerRow: 1, dataStart: 2,   dataEnd: 577 },
-  'רובע הדר (אוסישקין 9-11)': { headerRow: 1, dataStart: 2,   dataEnd: 83  },
-  'הרימון':                     { headerRow: 1, dataStart: 2,   dataEnd: 109 }
-};
-function saveRanges() { localStorage.setItem('mtz_ranges', JSON.stringify(SHEET_RANGES)); }
+const MASTER_SHEET_NAME = 'AppSheet_Master';
 
 const STATUS = {
   SOLD: 'חתום',
@@ -401,64 +371,49 @@ const STATUS = {
   AVAIL: 'למכירה'
 };
 
-// Columns (0-indexed) — mapped to actual sheet headers:
-// 0  מספר או שם בנין
-// 1  מספר דירה
-// 2  שם הדגם
-// 3  קומה
-// 4  סוג הדגם
-// 5  דוח אפס עדכני
-// 6  מחיר PreSale
-// 7  מחיר הדירה (מחירון כולל מע"מ)
-// 8  מחיר למ"ר
-// 9  מכירה בפועל  ← הכנסות בפועל
-// 10 שטח הדירה
-// 11 מספר חדרים
-// 12 מספר חדרי אמבטיה
-// 13 מספר חדרי שירותים
-// 14 שטח מרפסות (כללי)
-// 15 מרפסת צידית מקורה
-// 16 מרפסת גג/שטח מרוצף
-// 17 שטח גינה
-// 18 מ"ר משוכלל
-// 19 כיוונים
-// 20 רוכשים/בעלי קרקע
-// 21 סטטוס
-// 22 מס' חניה
-// 23 מס' מחסן
-// 24 שטח מחסן
-// 25 תאריך בקשת רכישה
-// 26 צפי תאריך חתימה
-// 27 תאריך חתימת הסכם
+// מיפוי עמודות חדש המבוסס על AppSheet_Master (הכל זז ב-2 בגלל ה-ID ושם הפרויקט)
 const COL = {
-  BUILDING: 0, APT: 1, MODEL: 2, FLOOR: 3,
-  APT_TYPE: 4,
-  PRICE_ZERO: 5,
-  PRICE_PRESALE: 6,
-  PRICE_LIST: 7,
-  PRICE_PER_SQM: 8,
-  PRICE_SALE: 9,
-  AREA: 10, ROOMS: 11,
-  BATH: 12, TOILET: 13,
-  BALCONY: 14, BALCONY_SIDE: 15, BALCONY_ROOF: 16,
-  GARDEN: 17, SQM_W: 18,
-  DIRS: 19, BUYERS: 20, STATUS: 21,
-  PARKING: 22, STORAGE: 23, STORAGE_AREA: 24,
-  DATE_REQ: 25, DATE_SIGN_EXP: 26, DATE_SIGN: 27
+  UNIQUE_ID: 0,
+  PROJECT_NAME: 1,
+  BUILDING: 2, 
+  APT: 3, 
+  MODEL: 4, 
+  FLOOR: 5,
+  APT_TYPE: 6,
+  PRICE_ZERO: 7,
+  PRICE_PRESALE: 8,
+  PRICE_LIST: 9,
+  PRICE_PER_SQM: 10,
+  PRICE_SALE: 11,
+  AREA: 12, 
+  ROOMS: 13,
+  BATH: 14, 
+  TOILET: 15,
+  BALCONY: 16, 
+  BALCONY_SIDE: 17, 
+  BALCONY_ROOF: 18,
+  GARDEN: 19, 
+  SQM_W: 20,
+  DIRS: 21, 
+  BUYERS: 22, 
+  STATUS: 23,
+  PARKING: 24, 
+  STORAGE: 25, 
+  STORAGE_AREA: 26,
+  DATE_REQ: 27, 
+  DATE_SIGN_EXP: 28, 
+  DATE_SIGN: 29
 };
 
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
-let API_KEY = localStorage.getItem('mtz_key') || 'YOUR_API_KEY_HERE';
-let allData = {}; // sheetName -> [{...}]
+let API_KEY = localStorage.getItem('mtz_key') || '';
+let allData = {}; // sheetName (projectName) -> [{...}]
+let activeProjects = []; // רשימת פרויקטים שנשאבת אוטומטית מהדאטה
 let activeProject = null;
 let activeBuilding = null;
 let currentRoomFilter = 'all';
-let knownSheets = JSON.parse(localStorage.getItem('mtz_known') || '[]');
-let ignoredSheets = JSON.parse(localStorage.getItem('mtz_ignored') || '[]');
-let activeProjects = JSON.parse(localStorage.getItem('mtz_active_projects') || 'null');
-if (!activeProjects) activeProjects = [...RELEVANT_SHEETS];
 
 let filters = {projects:[], status:[], rooms:[], dirs:[], building:'', floor:'', year:'', buyer:'', quarters:[]};
 
@@ -494,17 +449,10 @@ document.getElementById('btn-connect').onclick = async () => {
   const errEl = document.getElementById('setup-err');
   const btn   = document.getElementById('btn-connect');
   errEl.style.color = '#888';
-  btn.textContent = 'שלב 1: בודק חיבור...';
+  btn.textContent = 'מתחבר לנתונים...';
   btn.disabled = true;
   try {
-    // Step 1: simple test
-    errEl.textContent = 'שלב 1: בודק גישה לגיליון...';
-    const testUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=spreadsheetId`;
-    const testRes = await fetch(testUrl);
-    const testJson = await testRes.json();
-    if (!testRes.ok) throw new Error(`שלב 1 נכשל (${testRes.status}): ${testJson.error?.message}`);
-    errEl.textContent = 'שלב 2: טוען לשוניות...';
-    // Step 2: load data
+    errEl.textContent = 'מושך נתונים מגיליון המאסטר...';
     await loadAllData();
     errEl.style.color = '';
     errEl.textContent = '';
@@ -519,56 +467,10 @@ document.getElementById('btn-connect').onclick = async () => {
 };
 
 // ═══════════════════════════════════════
-// FETCH
+// FETCH MASTER SHEET DATA
 // ═══════════════════════════════════════
-async function fetchSheet(name) {
-  const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
-  const range = SHEET_RANGES[name];
-  if (range) {
-    const hUrl = base + encodeURIComponent(name) + `!A${range.headerRow}:AZ${range.headerRow}` + `?key=${API_KEY}`;
-    const dUrl = base + encodeURIComponent(name) + `!A${range.dataStart}:AZ${range.dataEnd}`   + `?key=${API_KEY}`;
-    const hRes = await fetch(hUrl);
-    if (!hRes.ok) { const e = await hRes.json(); throw new Error(e.error?.message || 'שגיאה'); }
-    const hJson = await hRes.json();
-    const dRes = await fetch(dUrl);
-    if (!dRes.ok) { const e = await dRes.json(); throw new Error(e.error?.message || 'שגיאה'); }
-    const dJson = await dRes.json();
-    const headers = (hJson.values || [[]])[0];
-    const data    = dJson.values || [];
-    return [headers, ...data];
-  } else {
-    const r = await fetch(base + encodeURIComponent(name) + `?key=${API_KEY}`);
-    if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'שגיאה'); }
-    return (await r.json()).values || [];
-  }
-}
-
-async function fetchAllSheetNames() {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=sheets.properties.title`;
-  const r = await fetch(url);
-  if (!r.ok) { const e=await r.json(); throw new Error(e.error?.message||'שגיאה'); }
-  return (await r.json()).sheets.map(s => s.properties.title);
-}
-
-function parseRows(values, sheetName) {
-  if (!values || values.length < 2) return [];
-  const headers = values[0];
-  return values.slice(1).map(row => {
-    const o = { _sheet: sheetName };
-    headers.forEach((h,i) => { o[h] = (row[i]||'').toString().trim(); });
-    // map by position too
-    row.forEach((v,i) => { o['_c'+i] = v ? v.toString().trim() : ''; });
-    return o;
-  }).filter(r => r['_c'+COL.APT] || r['_c'+COL.STATUS]);
-}
-
 function getVal(row, colIdx) { return row['_c'+colIdx] || ''; }
-
-function parsePrice(v) {
-  if (!v) return 0;
-  return parseFloat(v.replace(/[^\d.]/g,'')) || 0;
-}
-
+function parsePrice(v) { if (!v) return 0; return parseFloat(v.replace(/[^\d.]/g,'')) || 0; }
 function fmtPrice(n) {
   if (!n) return '—';
   if (n >= 1000000) return '₪' + (n/1000000).toFixed(2) + 'M';
@@ -577,75 +479,47 @@ function fmtPrice(n) {
 
 async function loadAllData() {
   allData = {};
-  const allNames = await fetchAllSheetNames();
-  const newSheets = allNames.filter(n => !RELEVANT_SHEETS.includes(n) && !knownSheets.includes(n) && !ignoredSheets.includes(n));
-  newSheets.forEach(n => { if (!knownSheets.includes(n)) knownSheets.push(n); });
-  localStorage.setItem('mtz_known', JSON.stringify(knownSheets));
-  for (const name of activeProjects) {
-    if (!allNames.includes(name)) continue;
-    const vals = await fetchSheet(name);
-    allData[name] = parseRows(vals, name);
+  activeProjects = [];
+
+  const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
+  const url = base + encodeURIComponent(MASTER_SHEET_NAME) + `!A1:AZ?key=${API_KEY}`;
+  
+  const r = await fetch(url);
+  if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'שגיאה במשיכת נתונים'); }
+  
+  const json = await r.json();
+  const values = json.values || [];
+
+  if (values.length < 2) {
+    renderHome();
+    return;
   }
-  // DEBUG: log unique status values per sheet
-  Object.entries(allData).forEach(([name, rows]) => {
-    const statuses = [...new Set(rows.map(r => getVal(r, COL.STATUS)))].filter(Boolean);
-    console.log('STATUSES in', name, ':', statuses);
-    const l2 = rows.filter(r => getVal(r,COL.STATUS).includes('שלב'));
-    console.log('  Land2 rows:', l2.length, l2.slice(0,2).map(r=>getVal(r,COL.STATUS)));
+
+  const headers = values[0];
+  const rows = values.slice(1);
+
+  // חלוקת הנתונים לפרויקטים השונים בצורה אוטומטית
+  rows.forEach(row => {
+    const pName = (row[COL.PROJECT_NAME] || '').toString().trim();
+    if (!pName) return; // מתעלם משורות ללא שם פרויקט
+
+    if (!allData[pName]) {
+      allData[pName] = [];
+      if (!activeProjects.includes(pName)) activeProjects.push(pName);
+    }
+
+    // יצירת אובייקט הדירה
+    const o = { _sheet: pName };
+    headers.forEach((h, i) => { o[h] = (row[i] || '').toString().trim(); });
+    row.forEach((v, i) => { o['_c'+i] = v ? v.toString().trim() : ''; });
+
+    // מוסיף למערך רק אם יש מספר דירה או סטטוס (סינון שורות ריקות)
+    if (o['_c'+COL.APT] || o['_c'+COL.STATUS]) {
+      allData[pName].push(o);
+    }
   });
+
   renderHome();
-  checkNewSheets(newSheets.filter(n => !ignoredSheets.includes(n)));
-}
-
-// ═══════════════════════════════════════
-// NEW SHEET DETECTION
-// ═══════════════════════════════════════
-function checkNewSheets(newOnes) {
-  const cont = document.getElementById('new-banners');
-  cont.innerHTML = '';
-  newOnes.forEach(name => {
-    const div = document.createElement('div');
-    div.className = 'new-banner';
-    div.innerHTML = `<span class="nb-text">לשונית חדשה זוהתה: <b>${name}</b> — להוסיף כפרויקט?</span>
-      <button class="nb-btn nb-yes" onclick="addProject('${name}',this.parentElement)">כן</button>
-      <button class="nb-btn nb-no" onclick="ignoreSheet('${name}',this.parentElement)">לא</button>`;
-    cont.appendChild(div);
-  });
-}
-
-async function addProject(name, el) {
-  // ask for row range before adding
-  el.innerHTML = `
-    <span class="nb-text"><b>${name}</b> — הגדר טווח שורות:</span>
-    <span style="font-size:12px;color:#fff;margin-left:6px;">שורת כותרות:</span>
-    <input id="nr-hdr-${name.replace(/\s/g,'_')}" type="number" value="1" style="width:44px;border-radius:6px;border:none;padding:4px 6px;font-size:13px;text-align:center;">
-    <span style="font-size:12px;color:#fff;margin-left:6px;">נתונים משורה:</span>
-    <input id="nr-start-${name.replace(/\s/g,'_')}" type="number" value="2" style="width:44px;border-radius:6px;border:none;padding:4px 6px;font-size:13px;text-align:center;">
-    <span style="font-size:12px;color:#fff;margin-left:6px;">עד שורה:</span>
-    <input id="nr-end-${name.replace(/\s/g,'_')}" type="number" value="200" style="width:54px;border-radius:6px;border:none;padding:4px 6px;font-size:13px;text-align:center;">
-    <button class="nb-btn nb-yes" onclick="confirmAddProject('${name}',this.parentElement)">אישור</button>
-    <button class="nb-btn nb-no" onclick="ignoreSheet('${name}',this.parentElement)">ביטול</button>`;
-}
-
-async function confirmAddProject(name, el) {
-  const key = name.replace(/\s/g,'_');
-  const headerRow = parseInt(document.getElementById('nr-hdr-'+key).value) || 1;
-  const dataStart = parseInt(document.getElementById('nr-start-'+key).value) || 2;
-  const dataEnd   = parseInt(document.getElementById('nr-end-'+key).value) || 200;
-  SHEET_RANGES[name] = { headerRow, dataStart, dataEnd };
-  saveRanges();
-  activeProjects.push(name);
-  localStorage.setItem('mtz_active_projects', JSON.stringify(activeProjects));
-  el.remove();
-  const vals = await fetchSheet(name);
-  allData[name] = parseRows(vals, name);
-  renderHome();
-}
-
-function ignoreSheet(name, el) {
-  ignoredSheets.push(name);
-  localStorage.setItem('mtz_ignored', JSON.stringify(ignoredSheets));
-  el.remove();
 }
 
 // ═══════════════════════════════════════
@@ -657,17 +531,11 @@ function isSold(row) { return getStatus(row) === STATUS.SOLD; }
 function isReq(row) { return getStatus(row) === STATUS.REQ; }
 function isLand(row) {
   const s = (getStatus(row) || '').trim();
-  return (s === STATUS.LAND || s === 'ב.קרקע')
-    && !s.includes('שלב');
+  return (s === STATUS.LAND || s === 'ב.קרקע') && !s.includes('שלב');
 }
 function isLand2(row) {
   const s = (getStatus(row) || '').trim();
-  // match any variation: 'ב.קרקע משלב ב', 'ב.קרקע משלב ב', etc.
-  return s === STATUS.LAND2
-    || s === 'ב.קרקע משלב ב'
-    || s === 'ב.קרקע  משלב ב'
-    || (s.startsWith('ב.קרקע') && s.includes('שלב'))
-    || (s.includes('קרקע') && s.includes('שלב'));
+  return s === STATUS.LAND2 || s === 'ב.קרקע משלב ב' || s === 'ב.קרקע  משלב ב' || (s.startsWith('ב.קרקע') && s.includes('שלב')) || (s.includes('קרקע') && s.includes('שלב'));
 }
 function isRent(row) { return getStatus(row) === STATUS.RENT; }
 function isAvail(row) { return getStatus(row) === STATUS.AVAIL; }
@@ -679,14 +547,10 @@ function projectStats(rows) {
   const req = rows.filter(isReq);
   const avail = rows.filter(isAvail);
   const pct = forSale.length ? Math.round(sold.length / forSale.length * 100) : 0;
-  const curYear = new Date().getFullYear().toString();
-  const soldThisYear = sold.filter(r => {
-    const d = getVal(r, COL.DATE_SIGN) || getVal(r, COL.DATE_SIGN_EXP);
-    return d.includes(curYear);
-  }).length;
+  
   let revenue = 0;
   rows.forEach(r => { revenue += parsePrice(getVal(r, COL.PRICE_SALE)); });
-  return { total: rows.length, forSale: forSale.length, sold: sold.length, req: req.length, avail: avail.length, pct, soldThisYear, revenue };
+  return { total: rows.length, forSale: forSale.length, sold: sold.length, req: req.length, avail: avail.length, pct, revenue };
 }
 
 function buildingStats(rows) {
@@ -730,22 +594,24 @@ function tagClass(row) {
 function renderHome() {
   const body = document.getElementById('home-body');
   body.innerHTML = '';
-  if (!Object.keys(allData).length) {
-    body.innerHTML = '<div class="empty-wrap"><div class="empty-icon">📂</div><div class="empty-text">אין פרויקטים לטעינה</div></div>';
+  
+  if (!activeProjects.length) {
+    body.innerHTML = '<div class="empty-wrap"><div class="empty-icon">📂</div><div class="empty-text">אין פרויקטים בגיליון המאסטר</div></div>';
     return;
   }
+  
   activeProjects.forEach(name => {
     const rows = allData[name];
-    if (!rows) return;
+    if (!rows || !rows.length) return;
     const st = projectStats(rows);
-    const dname = DISPLAY_NAMES[name] || name;
     const dash = Math.round(st.pct * 113 / 100);
+    
     const card = document.createElement('div');
     card.className = 'proj-card';
     card.innerHTML = `
       <div class="pc-head">
         <div style="flex:1">
-          <div class="pc-name">${dname}</div>
+          <div class="pc-name">${name}</div>
           <div class="pc-sub">${st.total} יח"ד סה"כ · ${st.forSale} למכירה</div>
           <div style="margin-top:8px;background:rgba(255,255,255,0.1);border-radius:8px;padding:7px 10px;display:inline-block;">
             <div style="font-size:10px;color:rgba(255,255,255,.55);">הכנסות ממכירות</div>
@@ -781,8 +647,7 @@ let projRoomFilter = 'all';
 function openProject(name) {
   activeProject = name;
   projRoomFilter = 'all';
-  const dname = DISPLAY_NAMES[name] || name;
-  document.getElementById('proj-title').textContent = dname;
+  document.getElementById('proj-title').textContent = name;
   showScreen('s-project');
   renderProjectPage(name);
 }
@@ -793,7 +658,6 @@ function renderProjectPage(name) {
   const body = document.getElementById('proj-body');
   body.innerHTML = '';
 
-  // room filter bar
   const roomSet = new Set();
   rows.forEach(r => { const rm = getVal(r,COL.ROOMS); if(rm) roomSet.add(rm); });
   const roomsSorted = [...roomSet].sort((a,b) => parseFloat(a)-parseFloat(b));
@@ -819,7 +683,6 @@ function renderProjectPage(name) {
   document.getElementById('proj-sub').textContent = `${Object.keys(buildings).length} בניינים · ${rows.length} יח"ד`;
 
   Object.entries(buildings).forEach(([bldName, brows]) => {
-    // apply room filter
     const filtered = projRoomFilter === 'all' ? brows : brows.filter(r => getVal(r,COL.ROOMS) === projRoomFilter);
     const allBrows = brows;
 
@@ -832,7 +695,7 @@ function renderProjectPage(name) {
     const pct   = forSale ? Math.round(sold / forSale * 100) : 0;
     const total = filtered.length;
 
-    if (total === 0) return; // hide buildings with no matching rooms when filtered
+    if (total === 0) return;
 
     const card = document.createElement('div');
     card.className = 'bld-card';
@@ -862,16 +725,9 @@ function renderProjectPage(name) {
 // ═══════════════════════════════════════
 // BUILDING PAGE
 // ═══════════════════════════════════════
-// כיוונים כפי שכתובים בגיליון (ללא מקפים, ייתכן פסיק בין כיוונים מרובים)
-// הפונקציה normalizeDir מנרמלת את הערך לצורך השוואה
 const DIR_ORDER = ['צפון מערב','צפון מזרח','דרום מערב','דרום מזרח','צפון','דרום','מזרח','מערב'];
 
-// נרמול כיוון: מסיר מקפים, חותך רווחים, lowercase-ish
-function normalizeDir(d) {
-  return (d||'').replace(/-/g,' ').replace(/\s+/,' ').trim();
-}
-
-// מחזיר רשימת כיוונים עבור דירה (יכולה להיות מרובים מופרדים בפסיק)
+function normalizeDir(d) { return (d||'').replace(/-/g,' ').replace(/\s+/,' ').trim(); }
 function getDirs(row) {
   const raw = (getVal(row, COL.DIRS)||'').trim();
   if (!raw) return [''];
@@ -882,7 +738,7 @@ function openBuilding(projName, bldName, rows) {
   activeBuilding = { projName, bldName, rows };
   currentRoomFilter = 'all';
   document.getElementById('bld-title').textContent = bldName;
-  document.getElementById('bld-sub').textContent = (DISPLAY_NAMES[projName]||projName) + ' · ' + rows.length + ' יח"ד';
+  document.getElementById('bld-sub').textContent = projName + ' · ' + rows.length + ' יח"ד';
   showScreen('s-building');
   buildRoomFilter(rows);
   renderBuildingGrid(rows);
@@ -918,47 +774,30 @@ function renderBuildingGrid(rows) {
   const grid = document.getElementById('bld-grid');
   grid.innerHTML = '';
 
-  // ── 1. אסוף כל כיוונים קיימים (מנורמלים) ─────────────────
   const dirSet = new Set();
-  rows.forEach(r => {
-    getDirs(r).forEach(d => dirSet.add(d));
-  });
-  // סדר לפי DIR_ORDER, שאר כיוונים בסוף
-  const dirs = [
-    ...DIR_ORDER.filter(d => dirSet.has(d)),
-    ...[...dirSet].filter(d => !DIR_ORDER.includes(d) && d !== '')
-  ];
-  const hasEmpty = dirSet.has('');
-  if (hasEmpty || dirs.length === 0) dirs.push('');
+  rows.forEach(r => { getDirs(r).forEach(d => dirSet.add(d)); });
+  const dirs = [ ...DIR_ORDER.filter(d => dirSet.has(d)), ...[...dirSet].filter(d => !DIR_ORDER.includes(d) && d !== '') ];
+  if (dirSet.has('') || dirs.length === 0) dirs.push('');
 
-  // ── 2. בנה מפת קומות: floorMap[fl][dir] = [rows] ──────────
   const floorMap = {};
   rows.forEach(r => {
     const fl = (getVal(r, COL.FLOOR)||'').trim() || '0';
     if (!floorMap[fl]) floorMap[fl] = {};
     dirs.forEach(d => { if (!floorMap[fl][d]) floorMap[fl][d] = []; });
-    const rowDirs = getDirs(r);
-    // דירה עם כיוון יחיד — שים בעמודה שלה
-    // דירה עם מספר כיוונים — שים בעמודה הראשונה שמופיעה
-    const targetDir = rowDirs.find(d => dirs.includes(d)) || '';
+    const targetDir = getDirs(r).find(d => dirs.includes(d)) || '';
     if (!floorMap[fl][targetDir]) floorMap[fl][targetDir] = [];
     floorMap[fl][targetDir].push(r);
   });
 
-  // ── 3. מיין קומות מהגבוהה לנמוכה ──────────────────────────
   const floors = Object.keys(floorMap).sort((a, b) => {
     const na = parseFloat(a), nb = parseFloat(b);
     if (!isNaN(na) && !isNaN(nb)) return nb - na;
     return b.localeCompare(a, 'he');
   });
 
-  // ── 4. MAX דירות לכל כיוון (קובע רוחב עמודה) ──────────────
   const maxPerDir = {};
-  dirs.forEach(d => {
-    maxPerDir[d] = Math.max(1, ...floors.map(fl => (floorMap[fl][d]||[]).length));
-  });
+  dirs.forEach(d => { maxPerDir[d] = Math.max(1, ...floors.map(fl => (floorMap[fl][d]||[]).length)); });
 
-  // ── 5. כותרות כיוונים ──────────────────────────────────────
   if (dirs.filter(d=>d).length > 0) {
     const hdrRow = document.createElement('div');
     hdrRow.style.cssText = 'display:flex;gap:4px;margin-bottom:6px;padding-right:28px;';
@@ -972,7 +811,6 @@ function renderBuildingGrid(rows) {
     grid.appendChild(hdrRow);
   }
 
-  // ── 6. שורות קומה ──────────────────────────────────────────
   floors.forEach(fl => {
     const flRow = document.createElement('div');
     flRow.className = 'floor-row';
@@ -986,7 +824,7 @@ function renderBuildingGrid(rows) {
     aptsWrap.className = 'floor-apts';
 
     dirs.forEach(d => {
-      const apts    = floorMap[fl][d] || [];
+      const apts = floorMap[fl][d] || [];
       const colSpan = maxPerDir[d];
       const dirWrap = document.createElement('div');
       dirWrap.style.cssText = `flex:${colSpan};display:flex;gap:4px;min-width:0;`;
@@ -997,7 +835,6 @@ function renderBuildingGrid(rows) {
         empty.style.flex = '1';
         dirWrap.appendChild(empty);
       } else {
-        // ריווח שווה: כל דירה תופסת flex=colSpan/actual
         const flexVal = colSpan / apts.length;
         apts.forEach(r => {
           const rooms = getVal(r, COL.ROOMS);
@@ -1016,17 +853,13 @@ function renderBuildingGrid(rows) {
       }
       aptsWrap.appendChild(dirWrap);
     });
-
     flRow.appendChild(aptsWrap);
     grid.appendChild(flRow);
   });
 }
 
-
-
 function shortenDir(d) {
   if (!d) return '';
-  // handle comma-separated multi-dirs
   return d.split(/[,،]/).map(p => {
     const t = normalizeDir(p);
     return t.replace('צפון מערב','צ-מע').replace('צפון מזרח','צ-מז')
@@ -1041,7 +874,7 @@ function shortenDir(d) {
 // ═══════════════════════════════════════
 function openAptModal(row) {
   const aptNum = getVal(row, COL.APT);
-  const projName = DISPLAY_NAMES[row._sheet] || row._sheet;
+  const projName = row._sheet;
   const bld = getVal(row, COL.BUILDING);
   const fl = getVal(row, COL.FLOOR);
   const status = getStatus(row);
@@ -1063,7 +896,7 @@ function openAptModal(row) {
     ['מרפסת כללי',  v(COL.BALCONY)      ? v(COL.BALCONY)+' מ"ר'       : ''],
     ['מרפסת צידית', v(COL.BALCONY_SIDE) ? v(COL.BALCONY_SIDE)+' מ"ר'  : ''],
     ['מרפסת גג',    v(COL.BALCONY_ROOF) ? v(COL.BALCONY_ROOF)+' מ"ר'  : ''],
-    ['שטח גינה',    v(COL.GARDEN)       ? v(COL.GARDEN)+' מ"ר'         : ''],
+    ['שטח גינה',    v(COL.GARDEN)       ? v(COL.GARDEN)+' מ"ר'        : ''],
     ['כיוונים',     v(COL.DIRS)],
     ['רוכשים',      v(COL.BUYERS)],
     ['חניה',        v(COL.PARKING)],
@@ -1136,7 +969,6 @@ function renderSearch(results, q, showRevenue) {
     showScreen('s-search'); return;
   }
 
-  // סיכום סטטוס — תמיד מוצג
   const statusCounts = {};
   results.forEach(r => {
     const s = getStatus(r) || 'לא ידוע';
@@ -1161,7 +993,6 @@ function renderSearch(results, q, showRevenue) {
   sumDiv.innerHTML = '<div style="font-size:11px;color:var(--text-sub);margin-bottom:7px;">סה"כ '+results.length+' נכסים</div><div style="display:flex;flex-wrap:wrap;gap:6px;">'+chips+'</div>';
   body.appendChild(sumDiv);
 
-  // Revenue summary box (only for year/quarter filter)
   if (showRevenue) {
     let totalRev = 0;
     let countWithPrice = 0;
@@ -1207,7 +1038,7 @@ function renderSearch(results, q, showRevenue) {
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
           <div class="result-apt">דירה ${aptNum}${bld?' – '+bld:''}</div>
-          <div class="result-proj">${DISPLAY_NAMES[r._sheet]||r._sheet}${fl?' · קומה '+fl:''}</div>
+          <div class="result-proj">${r._sheet}${fl?' · קומה '+fl:''}</div>
         </div>
         ${showRevenue && price ? `<div style="font-size:15px;font-weight:700;color:var(--blue-dark);">${fmtPrice(price)}</div>` : ''}
       </div>
@@ -1236,18 +1067,16 @@ function closeFilterIfOutside(e) {
 }
 
 function buildFilterChips() {
-  // projects
   const fp = document.getElementById('f-projects');
   fp.innerHTML = '';
   activeProjects.forEach(p => {
     const c = document.createElement('button');
     c.className = 'chip' + (filters.projects.includes(p)?' on':'');
-    c.textContent = DISPLAY_NAMES[p]||p;
+    c.textContent = p;
     c.onclick = () => { c.classList.toggle('on'); toggleArr(filters.projects, p); };
     fp.appendChild(c);
   });
 
-  // status
   const fs = document.getElementById('f-status');
   fs.innerHTML = '';
   [STATUS.SOLD,STATUS.REQ,STATUS.AVAIL,STATUS.LAND,STATUS.LAND2,STATUS.RENT].forEach(st => {
@@ -1258,7 +1087,6 @@ function buildFilterChips() {
     fs.appendChild(c);
   });
 
-  // rooms
   const fr = document.getElementById('f-rooms');
   fr.innerHTML = '';
   const roomSet = new Set();
@@ -1271,7 +1099,6 @@ function buildFilterChips() {
     fr.appendChild(c);
   });
 
-  // dirs
   const fd = document.getElementById('f-dirs');
   fd.innerHTML = '';
   DIR_ORDER.filter(d=>d && d!=='').forEach(d => {
@@ -1317,7 +1144,6 @@ function applyFilters() {
   updateFilterCount();
   document.getElementById('filter-panel').classList.remove('open');
 
-  // run filter search
   let rows = allRows();
   if (filters.projects.length) rows = rows.filter(r => filters.projects.includes(r._sheet));
   if (filters.status.length) rows = rows.filter(r => {
@@ -1355,11 +1181,10 @@ function applyFilters() {
     rows = rows.filter(r => {
       const d = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || getVal(r,COL.DATE_REQ);
       if (!d) return false;
-      // try DD/MM/YYYY or MM/YYYY
       const parts = d.split(/[\/\-.]/);
       let month = null;
-      if (parts.length >= 3) month = parts[1]; // DD/MM/YYYY
-      else if (parts.length === 2) month = parts[0]; // MM/YYYY
+      if (parts.length >= 3) month = parts[1]; 
+      else if (parts.length === 2) month = parts[0]; 
       if (!month) return false;
       const q = MONTH_QUARTER[month.replace(/^0/,'')];
       return q && filters.quarters.includes(String(q));
