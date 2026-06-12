@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>מצלאוי – ניהול נכסים (Master)</title>
+<title>מצלאוי – ניהול נכסים</title>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -179,6 +179,94 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 .setup-btn:active{opacity:.88;}
 .setup-err{color:#c0392b;font-size:13px;margin-top:12px;text-align:center;}
 
+/* LANDING MENU */
+.menu-hero{background:var(--blue-dark);padding:22px 18px 26px;text-align:center;}
+.menu-logo{width:64px;height:64px;background:rgba(255,255,255,.12);border:0.5px solid rgba(255,255,255,.18);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:30px;}
+.menu-hero-title{font-size:22px;font-weight:700;color:#fff;}
+.menu-hero-sub{font-size:13px;color:rgba(255,255,255,.6);margin-top:3px;}
+.menu-grid{flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;-webkit-overflow-scrolling:touch;}
+.menu-tile{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 12px 16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;cursor:pointer;position:relative;overflow:hidden;min-height:128px;}
+.menu-tile:active{transform:scale(.97);}
+.menu-tile::before{content:"";position:absolute;top:0;right:0;left:0;height:4px;background:var(--blue-mid);}
+.menu-tile.t-emp::before{background:var(--green);}
+.menu-tile.t-fuel::before{background:var(--orange);}
+.menu-tile.t-rent::before{background:var(--blue-st);}
+.menu-ico{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px;background:var(--blue-st-bg);}
+.menu-tile.t-emp  .menu-ico{background:var(--green-bg);}
+.menu-tile.t-fuel .menu-ico{background:var(--orange-bg);}
+.menu-tile.t-rent .menu-ico{background:var(--blue-st-bg);}
+.menu-name{font-size:15px;font-weight:700;color:var(--text-main);}
+.menu-desc{font-size:11px;color:var(--text-sub);margin-top:3px;line-height:1.4;}
+.menu-soon{position:absolute;top:8px;left:8px;background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
+
+/* PLACEHOLDER (coming soon) */
+.soon-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px;text-align:center;}
+.soon-ico{font-size:54px;}
+.soon-title{font-size:19px;font-weight:700;color:var(--blue-dark);}
+.soon-text{font-size:14px;color:var(--text-sub);line-height:1.7;max-width:280px;}
+.soon-badge{margin-top:6px;background:var(--gold);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:12px;}
+
+/* GENERIC MODULE — record cards */
+.module-count{font-size:12px;color:var(--text-sub);padding:2px 2px 10px;}
+.rec-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden;}
+.rec-head{background:var(--blue-mid);color:#fff;font-weight:700;font-size:14px;padding:10px 13px;}
+.rec-body{padding:6px 13px 8px;}
+.rec-field{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
+.rec-field:last-child{border-bottom:none;}
+.rec-lbl{color:var(--text-sub);flex-shrink:0;}
+.rec-val{color:var(--text-main);font-weight:600;text-align:left;word-break:break-word;}
+
+/* EMPLOYEES — custom layout */
+.emp-field{padding:9px 14px;border-bottom:0.5px solid var(--border);}
+.emp-lbl{font-size:11px;color:var(--text-sub);margin-bottom:3px;}
+.emp-val{font-size:15px;font-weight:600;color:var(--text-main);word-break:break-word;direction:ltr;text-align:right;}
+.emp-expand{width:100%;background:#f8f9fc;border:none;border-top:0.5px solid var(--border);padding:11px;font-family:'Assistant',sans-serif;font-size:13px;font-weight:600;color:var(--blue-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.emp-expand:active{background:var(--gray-bg);}
+.emp-arrow{transition:transform .2s;font-size:11px;}
+.rec-card.open .emp-arrow{transform:rotate(180deg);}
+.emp-details{display:none;}
+.rec-card.open .emp-details{display:block;}
+.emp-field-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.emp-field-main{flex:1;min-width:0;}
+.wa-btn{flex-shrink:0;width:42px;height:42px;border-radius:50%;background:#25D366;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 7px rgba(37,211,102,.45);}
+.wa-btn:active{transform:scale(.92);}
+.wa-btn svg{width:23px;height:23px;fill:#fff;}
+
+/* TOPBAR SCAN SPIN */
+.tb-btn.spinning{animation:spin .8s linear infinite;}
+
+/* NAV DRAWER */
+.nav-overlay{position:fixed;inset:0;background:rgba(10,20,50,.5);z-index:300;display:none;}
+.nav-overlay.open{display:block;}
+.nav-drawer{position:absolute;top:0;right:0;bottom:0;width:76%;max-width:300px;background:var(--bg-card);box-shadow:-8px 0 28px rgba(26,58,107,.22);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .22s ease;overflow-y:auto;}
+.nav-overlay.open .nav-drawer{transform:translateX(0);}
+.nav-head{background:var(--blue-dark);color:#fff;padding:15px 16px;display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:700;}
+.nav-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:8px;font-size:14px;cursor:pointer;}
+.nav-item{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;border-bottom:0.5px solid var(--border);padding:14px 16px;font-family:'Assistant',sans-serif;font-size:15px;font-weight:600;color:var(--text-main);cursor:pointer;text-align:right;}
+.nav-item:active{background:var(--bg);}
+.nav-item.active{background:var(--blue-st-bg);color:var(--blue-st);}
+.nav-ico{font-size:20px;width:26px;text-align:center;flex-shrink:0;}
+.nav-sep{height:7px;background:var(--bg);}
+
+/* FUEL EDIT FORM */
+.fuel-edit{padding:11px 14px;background:var(--blue-st-bg);border-bottom:0.5px solid var(--border);}
+.fuel-edit-title{font-size:12px;font-weight:700;color:var(--blue-st);margin-bottom:9px;}
+.fuel-edit-field{margin-bottom:10px;}
+.fuel-edit-field label{display:block;font-size:11px;color:var(--text-sub);margin-bottom:4px;font-weight:600;}
+.fuel-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-family:'Assistant',sans-serif;font-size:14px;color:var(--text-main);background:#fff;outline:none;}
+.fuel-input:focus{border-color:var(--blue-mid);}
+.fuel-save{width:100%;margin-top:2px;padding:10px;background:var(--blue-dark);color:#fff;border:none;border-radius:9px;font-family:'Assistant',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.fuel-save:active{opacity:.88;}
+.fuel-save:disabled{opacity:.55;}
+.fuel-save-msg{font-size:12px;text-align:center;margin-top:7px;min-height:14px;font-weight:600;}
+
+/* NEW SHEET BANNER */
+.new-banner{background:var(--gold);color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:13px;flex-wrap:wrap;}
+.nb-text{flex:1;}
+.nb-btn{padding:5px 13px;border-radius:8px;font-family:'Assistant',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;}
+.nb-yes{background:#fff;color:var(--gold);}
+.nb-no{background:rgba(255,255,255,.25);color:#fff;}
+
 /* LOADING / EMPTY */
 .loading-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
 .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--blue-mid);border-radius:50%;animation:spin .8s linear infinite;}
@@ -198,6 +286,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 </head>
 <body>
 
+<!-- ═══ SETUP ═══ -->
 <div id="s-setup" class="screen active">
   <div class="setup-wrap">
     <div style="width:80px;height:80px;background:var(--blue-dark);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
@@ -209,6 +298,10 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
       <div class="setup-label">Google Sheets API Key</div>
       <input class="setup-input" id="inp-key" type="password" placeholder="AIzaSy..." autocomplete="off">
     </div>
+    <div class="setup-field">
+      <div class="setup-label">כתובת Apps Script לשמירה (לעריכת תלושי דלק)</div>
+      <input class="setup-input" id="inp-write-url" type="text" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" style="direction:ltr;">
+    </div>
     <button class="setup-btn" id="btn-connect">התחבר</button>
     <div class="setup-err" id="setup-err"></div>
     <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:20px;line-height:1.8;">
@@ -218,12 +311,76 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   </div>
 </div>
 
-<div id="s-home" class="screen">
+<!-- ═══ LANDING MENU ═══ -->
+<div id="s-landing" class="screen">
   <div class="tb">
     <div style="flex:1">
       <div class="tb-title">מצלאוי</div>
-      <div class="tb-sub">ניהול מלאי ופרויקטים</div>
+      <div class="tb-sub">יזמות והתחדשות בבנייה</div>
     </div>
+    <button class="tb-btn" onclick="showScreen('s-setup')" title="הגדרות">⚙️</button>
+  </div>
+  <div class="menu-hero">
+    <div class="menu-logo">🏗️</div>
+    <div class="menu-hero-title">ברוכים הבאים</div>
+    <div class="menu-hero-sub">בחר מערכת לניהול</div>
+  </div>
+  <div class="menu-grid">
+    <div class="menu-tile" onclick="showScreen('s-home')">
+      <div class="menu-ico">🏢</div>
+      <div class="menu-name">מלאי למכירה</div>
+      <div class="menu-desc">דירות, פרויקטים וסטטוס מכירה</div>
+    </div>
+    <div class="menu-tile t-emp" onclick="openModule('employees')">
+      <div class="menu-ico">👷</div>
+      <div class="menu-name">עובדים</div>
+      <div class="menu-desc">ניהול עובדים ונוכחות</div>
+    </div>
+    <div class="menu-tile t-fuel" onclick="openModule('fuel')">
+      <div class="menu-ico">⛽</div>
+      <div class="menu-name">תלושי דלק</div>
+      <div class="menu-desc">הקצאה ומעקב תלושים</div>
+    </div>
+    <div class="menu-tile t-rent" onclick="openModule('rentals')">
+      <div class="menu-ico">🔑</div>
+      <div class="menu-name">שכירויות</div>
+      <div class="menu-desc">חוזים ותשלומי שכירות</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GENERIC MODULE (employees / fuel / rentals) ═══ -->
+<div id="s-module" class="screen">
+  <div class="tb">
+    <button class="tb-btn" onclick="openNav()" title="תפריט ניווט">☰</button>
+    <div style="flex:1;margin-right:8px">
+      <div class="tb-title" id="module-title"></div>
+      <div class="tb-sub" id="module-sub"></div>
+    </div>
+    <button class="tb-btn" id="module-refresh" title="רענן">🔄</button>
+  </div>
+  <div class="search-wrap">
+    <div class="search-row">
+      <div class="s-box">
+        <span class="s-icon">🔍</span>
+        <input id="module-search" type="text" placeholder="חיפוש..." oninput="onModuleSearch(this.value)">
+      </div>
+    </div>
+  </div>
+  <div class="sbody" id="module-body">
+    <div class="loading-wrap"><div class="spinner"></div><div class="loading-text">טוען...</div></div>
+  </div>
+</div>
+
+<!-- ═══ HOME ═══ -->
+<div id="s-home" class="screen">
+  <div class="tb">
+    <button class="tb-btn" onclick="openNav()" title="תפריט ניווט">☰</button>
+    <div style="flex:1;margin-right:8px">
+      <div class="tb-title">מלאי למכירה</div>
+      <div class="tb-sub">יזמות והתחדשות בבנייה</div>
+    </div>
+    <button class="tb-btn" id="home-rescan" title="סרוק לשוניות חדשות">🔄</button>
     <button class="tb-btn" onclick="showScreen('s-setup')" title="הגדרות">⚙️</button>
   </div>
   <div class="search-wrap">
@@ -237,11 +394,13 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
       </button>
     </div>
   </div>
+  <div id="new-banners"></div>
   <div class="sbody" id="home-body">
-    <div class="loading-wrap"><div class="spinner"></div><div class="loading-text">טוען פרויקטים מגיליון Master...</div></div>
+    <div class="loading-wrap"><div class="spinner"></div><div class="loading-text">טוען פרויקטים...</div></div>
   </div>
 </div>
 
+<!-- ═══ SEARCH RESULTS ═══ -->
 <div id="s-search" class="screen">
   <div class="tb">
     <button class="tb-btn" onclick="goHome()">🏠</button>
@@ -254,6 +413,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   <div class="sbody" id="search-body"></div>
 </div>
 
+<!-- ═══ PROJECT (buildings) ═══ -->
 <div id="s-project" class="screen">
   <div class="tb">
     <button class="tb-btn" onclick="goHome()">🏠</button>
@@ -268,6 +428,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   </div>
 </div>
 
+<!-- ═══ BUILDING (apt grid) ═══ -->
 <div id="s-building" class="screen">
   <div class="tb">
     <button class="tb-btn" onclick="goHome()">🏠</button>
@@ -288,6 +449,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   <div class="bld-grid-wrap" id="bld-grid"></div>
 </div>
 
+<!-- ═══ APT DETAIL MODAL ═══ -->
 <div class="modal-overlay" id="apt-modal" onclick="closeModal(event)">
   <div class="modal-sheet">
     <span class="modal-handle"></span>
@@ -302,6 +464,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   </div>
 </div>
 
+<!-- ═══ FILTER PANEL ═══ -->
 <div class="filter-panel" id="filter-panel" onclick="closeFilterIfOutside(event)">
   <div class="filter-sheet">
     <span class="fhandle"></span>
@@ -355,12 +518,43 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   </div>
 </div>
 
+<!-- ═══ NAV DRAWER ═══ -->
+<div class="nav-overlay" id="nav-overlay" onclick="closeNavIfOutside(event)">
+  <div class="nav-drawer">
+    <div class="nav-head">
+      <span>ניווט</span>
+      <button class="nav-close" onclick="closeNav()" title="סגור">✕</button>
+    </div>
+    <button class="nav-item" data-dest="home" onclick="navTo('home')"><span class="nav-ico">🏠</span>תפריט ראשי</button>
+    <div class="nav-sep"></div>
+    <button class="nav-item" data-dest="inventory" onclick="navTo('inventory')"><span class="nav-ico">🏢</span>מלאי למכירה</button>
+    <button class="nav-item" data-dest="employees" onclick="navTo('employees')"><span class="nav-ico">👷</span>עובדים</button>
+    <button class="nav-item" data-dest="fuel" onclick="navTo('fuel')"><span class="nav-ico">⛽</span>תלושי דלק</button>
+    <button class="nav-item" data-dest="rentals" onclick="navTo('rentals')"><span class="nav-ico">🔑</span>שכירויות</button>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
 const SHEET_ID = '1c7WBFvyJ7hiPqFS0v_E0dRLVaUSKSa0Io0vHyXRUDHk';
-const MASTER_SHEET_NAME = 'AppSheet_Master';
+const RELEVANT_SHEETS = ['הורדים - נכסים','רובע אילון שלב א - נכסים','רובע הדר (אוסישקין 9-11)','הרימון'];
+const DISPLAY_NAMES = {
+  'הורדים - נכסים':'הורדים',
+  'רובע אילון שלב א - נכסים':'רובע אילון שלב א',
+  'רובע הדר (אוסישקין 9-11)':'רובע הדר',
+  'הרימון':'הרימון'
+};
+
+// row ranges per project: headerRow = row with column names (1-based), dataStart/dataEnd = actual data rows
+let SHEET_RANGES = JSON.parse(localStorage.getItem('mtz_ranges') || 'null') || {
+  'הורדים - נכסים':            { headerRow: 2, dataStart: 3,   dataEnd: 130 },
+  'רובע אילון שלב א - נכסים': { headerRow: 1, dataStart: 2,   dataEnd: 577 },
+  'רובע הדר (אוסישקין 9-11)': { headerRow: 1, dataStart: 2,   dataEnd: 83  },
+  'הרימון':                     { headerRow: 1, dataStart: 2,   dataEnd: 109 }
+};
+function saveRanges() { localStorage.setItem('mtz_ranges', JSON.stringify(SHEET_RANGES)); }
 
 const STATUS = {
   SOLD: 'חתום',
@@ -371,49 +565,64 @@ const STATUS = {
   AVAIL: 'למכירה'
 };
 
-// מיפוי עמודות חדש המבוסס על AppSheet_Master (הכל זז ב-2 בגלל ה-ID ושם הפרויקט)
+// Columns (0-indexed) — mapped to actual sheet headers:
+// 0  מספר או שם בנין
+// 1  מספר דירה
+// 2  שם הדגם
+// 3  קומה
+// 4  סוג הדגם
+// 5  דוח אפס עדכני
+// 6  מחיר PreSale
+// 7  מחיר הדירה (מחירון כולל מע"מ)
+// 8  מחיר למ"ר
+// 9  מכירה בפועל  ← הכנסות בפועל
+// 10 שטח הדירה
+// 11 מספר חדרים
+// 12 מספר חדרי אמבטיה
+// 13 מספר חדרי שירותים
+// 14 שטח מרפסות (כללי)
+// 15 מרפסת צידית מקורה
+// 16 מרפסת גג/שטח מרוצף
+// 17 שטח גינה
+// 18 מ"ר משוכלל
+// 19 כיוונים
+// 20 רוכשים/בעלי קרקע
+// 21 סטטוס
+// 22 מס' חניה
+// 23 מס' מחסן
+// 24 שטח מחסן
+// 25 תאריך בקשת רכישה
+// 26 צפי תאריך חתימה
+// 27 תאריך חתימת הסכם
 const COL = {
-  UNIQUE_ID: 0,
-  PROJECT_NAME: 1,
-  BUILDING: 2, 
-  APT: 3, 
-  MODEL: 4, 
-  FLOOR: 5,
-  APT_TYPE: 6,
-  PRICE_ZERO: 7,
-  PRICE_PRESALE: 8,
-  PRICE_LIST: 9,
-  PRICE_PER_SQM: 10,
-  PRICE_SALE: 11,
-  AREA: 12, 
-  ROOMS: 13,
-  BATH: 14, 
-  TOILET: 15,
-  BALCONY: 16, 
-  BALCONY_SIDE: 17, 
-  BALCONY_ROOF: 18,
-  GARDEN: 19, 
-  SQM_W: 20,
-  DIRS: 21, 
-  BUYERS: 22, 
-  STATUS: 23,
-  PARKING: 24, 
-  STORAGE: 25, 
-  STORAGE_AREA: 26,
-  DATE_REQ: 27, 
-  DATE_SIGN_EXP: 28, 
-  DATE_SIGN: 29
+  BUILDING: 0, APT: 1, MODEL: 2, FLOOR: 3,
+  APT_TYPE: 4,
+  PRICE_ZERO: 5,
+  PRICE_PRESALE: 6,
+  PRICE_LIST: 7,
+  PRICE_PER_SQM: 8,
+  PRICE_SALE: 9,
+  AREA: 10, ROOMS: 11,
+  BATH: 12, TOILET: 13,
+  BALCONY: 14, BALCONY_SIDE: 15, BALCONY_ROOF: 16,
+  GARDEN: 17, SQM_W: 18,
+  DIRS: 19, BUYERS: 20, STATUS: 21,
+  PARKING: 22, STORAGE: 23, STORAGE_AREA: 24,
+  DATE_REQ: 25, DATE_SIGN_EXP: 26, DATE_SIGN: 27
 };
 
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
-let API_KEY = localStorage.getItem('mtz_key') || '';
-let allData = {}; // sheetName (projectName) -> [{...}]
-let activeProjects = []; // רשימת פרויקטים שנשאבת אוטומטית מהדאטה
+let API_KEY = localStorage.getItem('mtz_key') || 'YOUR_API_KEY_HERE';
+let allData = {}; // sheetName -> [{...}]
 let activeProject = null;
 let activeBuilding = null;
 let currentRoomFilter = 'all';
+let knownSheets = JSON.parse(localStorage.getItem('mtz_known') || '[]');
+let ignoredSheets = JSON.parse(localStorage.getItem('mtz_ignored') || '[]');
+let activeProjects = JSON.parse(localStorage.getItem('mtz_active_projects') || 'null');
+if (!activeProjects) activeProjects = [...RELEVANT_SHEETS];
 
 let filters = {projects:[], status:[], rooms:[], dirs:[], building:'', floor:'', year:'', buyer:'', quarters:[]};
 
@@ -428,14 +637,641 @@ function toggleQuarter(el) {
 // ═══════════════════════════════════════
 // SCREEN NAV
 // ═══════════════════════════════════════
-function showScreen(id) {
+function showScreen(id, isBack) {
+  const current = document.querySelector('.screen.active');
+  if (current && current.id !== id && !isBack) navStack.push(current.id);
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
+let navStack = [];
+function goBack() {
+  // אם תפריט הניווט / מודאל / פאנל סינון פתוחים — סגור אותם קודם
+  const nav = document.getElementById('nav-overlay');
+  if (nav && nav.classList.contains('open')) { nav.classList.remove('open'); return; }
+  const modal = document.getElementById('apt-modal');
+  if (modal && modal.classList.contains('open')) { modal.classList.remove('open'); return; }
+  const panel = document.getElementById('filter-panel');
+  if (panel && panel.classList.contains('open')) { panel.classList.remove('open'); return; }
+  if (navStack.length) showScreen(navStack.pop(), true);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { e.preventDefault(); goBack(); }
+});
 function goHome() {
   document.getElementById('g-search').value = '';
   showScreen('s-home');
+}
+function goLanding() {
+  document.getElementById('g-search').value = '';
+  showScreen('s-landing');
+}
+
+// ═══════════════════════════════════════
+// NAV DRAWER — מעבר ישיר בין קטגוריות
+// ═══════════════════════════════════════
+function openNav() {
+  // סימון הקטגוריה הנוכחית
+  const active = document.querySelector('.screen.active');
+  const cur = active && active.id === 's-home' ? 'inventory'
+            : active && active.id === 's-module' ? currentModule
+            : null;
+  document.querySelectorAll('.nav-item').forEach(it => {
+    it.classList.toggle('active', it.dataset.dest === cur);
+  });
+  document.getElementById('nav-overlay').classList.add('open');
+}
+function closeNav() { document.getElementById('nav-overlay').classList.remove('open'); }
+function closeNavIfOutside(e) { if (e.target === document.getElementById('nav-overlay')) closeNav(); }
+function navTo(dest) {
+  closeNav();
+  if (dest === 'home') goLanding();
+  else if (dest === 'inventory') { document.getElementById('g-search').value = ''; showScreen('s-home'); }
+  else openModule(dest);
+}
+
+// ═══════════════════════════════════════
+// GENERIC MODULES (עובדים / תלושי דלק / שכירויות)
+// ═══════════════════════════════════════
+const MODULES = {
+  employees: {
+    title: 'עובדים', sub: 'רשימת עובדים',
+    spreadsheetId: '1p4z1BMFyQV42lDWrM_Z4OwLo01Ie0gdIcQYTQuq_G24',
+    tab: 'Master_Employees_Data',
+    headerRow: 2, titleCol: 0
+  },
+  fuel: {
+    title: 'תלושי דלק', sub: 'הקצאה ומעקב תלושים',
+    spreadsheetId: '1p4z1BMFyQV42lDWrM_Z4OwLo01Ie0gdIcQYTQuq_G24',
+    tab: 'תלושי דלק',
+    headerRow: 1, titleCol: 0,
+    hideZeroCol: 13   // עמודה N — יתרה; שורות עם 0 לא יוצגו
+  },
+  rentals: {
+    title: 'שכירויות', sub: 'חוזים ותשלומי שכירות',
+    spreadsheetId: '1l3AspC5I1e5QpHbWEt-OtXIPNLgf3L3n0L3zqFzO9J8',
+    tab: 'שכירויות',
+    headerRow: 1, titleCol: 0
+  }
+};
+let moduleCache = {};     // key -> values[][]
+let moduleSearchQ = {};   // key -> query
+let currentModule = null;
+
+async function fetchTab(ssId, tab) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${ssId}/values/${encodeURIComponent(tab)}?key=${API_KEY}`;
+  const r = await fetch(url);
+  if (!r.ok) {
+    let msg = 'שגיאה ' + r.status;
+    try { const e = await r.json(); if (e.error?.message) msg = e.error.message; } catch(_) {}
+    throw new Error(msg);
+  }
+  return (await r.json()).values || [];
+}
+
+function openModule(key) {
+  if (!MODULES[key]) return;
+  currentModule = key;
+  const cfg = MODULES[key];
+  document.getElementById('module-title').textContent = cfg.title;
+  document.getElementById('module-sub').textContent = cfg.sub;
+  document.getElementById('module-search').value = moduleSearchQ[key] || '';
+  showScreen('s-module');
+  // מודול הדלק נטען תמיד מחדש כדי לשקף יתרות מעודכנות (והסתרת תלושים שהתאפסו)
+  if (key === 'fuel') loadModule(key, true);
+  else if (moduleCache[key]) renderModule(key);
+  else loadModule(key);
+}
+
+async function loadModule(key, force) {
+  const cfg = MODULES[key];
+  const body = document.getElementById('module-body');
+  if (force || !moduleCache[key]) {
+    body.innerHTML = '<div class="loading-wrap"><div class="spinner"></div><div class="loading-text">טוען...</div></div>';
+    if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') {
+      body.innerHTML = '';
+      const w = document.createElement('div'); w.className = 'empty-wrap';
+      const i = document.createElement('div'); i.className = 'empty-icon'; i.textContent = '🔑';
+      const t = document.createElement('div'); t.className = 'empty-text'; t.textContent = 'יש להתחבר תחילה דרך מסך ההגדרות';
+      w.append(i, t); body.appendChild(w);
+      return;
+    }
+    try {
+      const vals = await fetchTab(cfg.spreadsheetId, cfg.tab);
+      moduleCache[key] = vals;
+    } catch(e) {
+      if (currentModule !== key) return;
+      body.innerHTML = '';
+      const w = document.createElement('div'); w.className = 'empty-wrap';
+      const i = document.createElement('div'); i.className = 'empty-icon'; i.textContent = '⚠️';
+      const t = document.createElement('div'); t.className = 'empty-text';
+      t.textContent = 'שגיאה בטעינת "' + cfg.tab + '": ' + e.message;
+      w.append(i, t); body.appendChild(w);
+      return;
+    }
+  }
+  if (currentModule === key) renderModule(key);
+}
+
+function onModuleSearch(v) {
+  if (!currentModule) return;
+  moduleSearchQ[currentModule] = v;
+  if (moduleCache[currentModule]) renderModule(currentModule);
+}
+
+function renderModule(key) {
+  if (key === 'employees') renderEmployees(key);
+  else if (key === 'fuel') renderFuel(key);
+  else renderModuleData(key);
+}
+
+// תצוגת עובדים מותאמת: שם (כותרת כחולה) → תאריך לידה / מייל / סיסמא → "פרטים נוספים"
+const EMP_TITLE_COL = 0;            // עמודה A — שם מלא
+const EMP_FIRSTNAME_COL = 1;        // עמודה B — שם פרטי
+const EMP_PHONE_COL = 41;           // עמודה AP — נייד
+const EMP_PRIMARY = [
+  { label: 'תאריך לידה',  col: 3 }, // עמודה D
+  { label: 'כתובת מייל',  col: 4 }, // עמודה E
+  { label: 'סיסמא למייל', col: 6, wa: true } // עמודה G + כפתור וואטסאפ
+];
+
+// המרת מספר ישראלי לפורמט בינלאומי לוואטסאפ (972...)
+function normalizePhoneIL(raw) {
+  if (raw == null) return '';
+  let d = String(raw).replace(/\D/g, '');
+  if (!d) return '';
+  if (d.startsWith('972')) return d;
+  if (d.startsWith('0')) d = d.slice(1);
+  return '972' + d;
+}
+
+function makeWaButton(phone, firstName, password) {
+  const btn = document.createElement('button');
+  btn.className = 'wa-btn';
+  btn.title = 'שליחת סיסמא בוואטסאפ';
+  btn.setAttribute('aria-label', 'שליחת סיסמא בוואטסאפ');
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>';
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const msg = `היי ${firstName}, סיסמת המייל שלך היא: ${password}`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    const win = window.open(url, '_blank');
+    if (!win) location.href = url;
+  });
+  return btn;
+}
+
+function renderEmployees(key) {
+  if (currentModule !== key) return;
+  const cfg = MODULES[key];
+  const body = document.getElementById('module-body');
+  const all = moduleCache[key] || [];
+  const hr = cfg.headerRow || 1;
+  const headers = (all[hr - 1] || []).map(h => (h == null ? '' : String(h)));
+  let rows = all.slice(hr).filter(r => r && r.some(c => c != null && String(c).trim() !== ''));
+  const q = (moduleSearchQ[key] || '').trim().toLowerCase();
+  if (q) {
+    const terms = q.split(/\s+/).filter(Boolean);
+    rows = rows.filter(r => {
+      const target = ((r[1] != null ? r[1] : '') + ' ' + (r[2] != null ? r[2] : '')).toLowerCase();
+      return terms.every(t => target.includes(t));
+    });
+  }
+  body.innerHTML = '';
+  const count = document.createElement('div');
+  count.className = 'module-count';
+  count.textContent = rows.length + ' עובדים' + (q ? ' (מתוך ' + (all.length - hr) + ')' : '');
+  body.appendChild(count);
+
+  if (!rows.length) {
+    const w = document.createElement('div'); w.className = 'empty-wrap';
+    const i = document.createElement('div'); i.className = 'empty-icon'; i.textContent = '📭';
+    const t = document.createElement('div'); t.className = 'empty-text';
+    t.textContent = q ? 'אין תוצאות לחיפוש' : 'אין נתונים בלשונית';
+    w.append(i, t); body.appendChild(w);
+    return;
+  }
+
+  const skip = new Set([EMP_TITLE_COL, ...EMP_PRIMARY.map(p => p.col)]);
+  const frag = document.createDocumentFragment();
+  rows.forEach(r => {
+    const card = document.createElement('div'); card.className = 'rec-card';
+
+    // כותרת כחולה — שם מלא (עמודה A)
+    const head = document.createElement('div'); head.className = 'rec-head';
+    let name = r[EMP_TITLE_COL] != null ? String(r[EMP_TITLE_COL]).trim() : '';
+    if (!name) { const f = r.find(c => c != null && String(c).trim() !== ''); name = f != null ? String(f) : '—'; }
+    head.textContent = name;
+    card.appendChild(head);
+
+    // שדות ראשיים — כותרת למעלה, נתון למטה
+    EMP_PRIMARY.forEach(p => {
+      const val = r[p.col] != null ? String(r[p.col]).trim() : '';
+      const fld = document.createElement('div'); fld.className = 'emp-field';
+      const main = document.createElement('div'); main.className = 'emp-field-main';
+      const l = document.createElement('div'); l.className = 'emp-lbl'; l.textContent = p.label;
+      const v = document.createElement('div'); v.className = 'emp-val'; v.textContent = val || '—';
+      main.append(l, v);
+      if (p.wa) {
+        fld.classList.add('emp-field-row');
+        fld.appendChild(main);
+        const phone = normalizePhoneIL(r[EMP_PHONE_COL]);
+        const first = r[EMP_FIRSTNAME_COL] != null ? String(r[EMP_FIRSTNAME_COL]).trim() : '';
+        if (phone && val) fld.appendChild(makeWaButton(phone, first, val));
+      } else {
+        fld.appendChild(main);
+      }
+      card.appendChild(fld);
+    });
+
+    // פרטים נוספים — שאר העמודות, עם כותרות משורה 2
+    const details = document.createElement('div'); details.className = 'emp-details';
+    const rb = document.createElement('div'); rb.className = 'rec-body';
+    const maxCols = Math.max(headers.length, r.length);
+    let any = false;
+    for (let i = 0; i < maxCols; i++) {
+      if (skip.has(i)) continue;
+      const val = r[i] != null ? String(r[i]).trim() : '';
+      if (!val) continue;
+      any = true;
+      const lbl = (headers[i] && headers[i].trim()) ? headers[i] : ('עמודה ' + (i + 1));
+      const f = document.createElement('div'); f.className = 'rec-field';
+      const ls = document.createElement('span'); ls.className = 'rec-lbl'; ls.textContent = lbl;
+      const vs = document.createElement('span'); vs.className = 'rec-val'; vs.textContent = val;
+      f.append(ls, vs); rb.appendChild(f);
+    }
+    details.appendChild(rb);
+
+    if (any) {
+      const btn = document.createElement('button'); btn.className = 'emp-expand';
+      const txt = document.createElement('span'); txt.textContent = 'פרטים נוספים';
+      const arr = document.createElement('span'); arr.className = 'emp-arrow'; arr.textContent = '▾';
+      btn.append(txt, arr);
+      btn.addEventListener('click', () => {
+        const open = card.classList.toggle('open');
+        txt.textContent = open ? 'הסתר פרטים' : 'פרטים נוספים';
+      });
+      card.appendChild(btn);
+      card.appendChild(details);
+    }
+    frag.appendChild(card);
+  });
+  body.appendChild(frag);
+}
+
+// בונה את אזור "פרטים נוספים" + כפתור ההרחבה (משותף לדלק)
+function buildExpandDetails(card, r, headers, skipSet) {
+  const details = document.createElement('div'); details.className = 'emp-details';
+  const rb = document.createElement('div'); rb.className = 'rec-body';
+  const maxCols = Math.max(headers.length, r.length);
+  let any = false;
+  for (let i = 0; i < maxCols; i++) {
+    if (skipSet.has(i)) continue;
+    const val = r[i] != null ? String(r[i]).trim() : '';
+    if (!val) continue;
+    any = true;
+    const lbl = (headers[i] && headers[i].trim()) ? headers[i] : ('עמודה ' + (i + 1));
+    const f = document.createElement('div'); f.className = 'rec-field';
+    const ls = document.createElement('span'); ls.className = 'rec-lbl'; ls.textContent = lbl;
+    const vs = document.createElement('span'); vs.className = 'rec-val'; vs.textContent = val;
+    f.append(ls, vs); rb.appendChild(f);
+  }
+  details.appendChild(rb);
+  if (!any) return;
+  const btn = document.createElement('button'); btn.className = 'emp-expand';
+  const txt = document.createElement('span'); txt.textContent = 'פרטים נוספים';
+  const arr = document.createElement('span'); arr.className = 'emp-arrow'; arr.textContent = '▾';
+  btn.append(txt, arr);
+  btn.addEventListener('click', () => {
+    const open = card.classList.toggle('open');
+    txt.textContent = open ? 'הסתר פרטים' : 'פרטים נוספים';
+  });
+  card.appendChild(btn);
+  card.appendChild(details);
+}
+
+// תצוגת תלושי דלק מותאמת
+const FUEL_CARD_COL = 0;     // עמודה A — מספר כרטיס
+const FUEL_EMP_COL = 5;      // עמודה F — שם עובד משויך
+const FUEL_BALANCE_COL = 13; // עמודה N — יתרה
+const FUEL_DATE1_COL = 8;    // עמודה I — תאריך תדלוק ראשון
+const FUEL_AMT1_COL  = 11;   // עמודה L — גובה תדלוק ראשון
+const FUEL_DATE2_COL = 9;    // עמודה J — תאריך תדלוק שני
+const FUEL_AMT2_COL  = 12;   // עמודה M — גובה תדלוק שני
+const FUEL_VEHICLE_COL = 10; // עמודה K — מספר רכב
+const FUEL_DEFAULT_AMT = 250;
+
+// כתובת ה-Apps Script לכתיבה חזרה לגיליון (מוטמעת; ניתנת לעדכון בהגדרות)
+let FUEL_WRITE_URL = localStorage.getItem('mtz_fuel_write_url') || 'https://script.google.com/macros/s/AKfycbyl_HFENKt6TnosbpoVtvD1CGLIabVO-o1yPWcRdYMlEnlb-goog-ztHcgNkPiQIOnMtA/exec';
+
+// ── עזרי תאריך ──
+function todayISO() {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+function toInputDate(raw) { // מנסה להמיר ערך קיים ל-YYYY-MM-DD עבור שדה תאריך
+  if (raw == null) return '';
+  const s = String(raw).trim();
+  if (!s) return '';
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);            // YYYY-MM-DD
+  if (m) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);  // DD/MM/YYYY
+  if (m) { let y = m[3]; if (y.length === 2) y = '20' + y; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+  return '';
+}
+function isoToSheetDate(iso) { // פורמט כתיבה לגיליון: DD/MM/YY
+  const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[3]}/${m[2]}/${m[1].slice(2)}` : iso;
+}
+
+function renderFuel(key) {
+  if (currentModule !== key) return;
+  const cfg = MODULES[key];
+  const body = document.getElementById('module-body');
+  const all = moduleCache[key] || [];
+  const hr = cfg.headerRow || 1;
+  const headers = (all[hr - 1] || []).map(h => (h == null ? '' : String(h)));
+
+  // איסוף שורות נתונים עם שמירת מספר השורה האמיתי בגיליון (ai+1)
+  let items = [];
+  for (let ai = hr; ai < all.length; ai++) {
+    const r = all[ai];
+    if (!(r && r.some(c => c != null && String(c).trim() !== ''))) continue;
+    items.push({ ai, r });
+  }
+  if (cfg.hideZeroCol != null) {
+    items = items.filter(({ r }) => {
+      const num = parseFloat(String(r[cfg.hideZeroCol] == null ? '' : r[cfg.hideZeroCol]).replace(/[^\d.\-]/g, ''));
+      return !(Number.isFinite(num) && num === 0);
+    });
+  }
+  const q = (moduleSearchQ[key] || '').trim().toLowerCase();
+  if (q) items = items.filter(({ r }) => r.some(c => c != null && String(c).toLowerCase().includes(q)));
+
+  body.innerHTML = '';
+  const count = document.createElement('div');
+  count.className = 'module-count';
+  count.textContent = items.length + ' תלושים פעילים' + (q ? ' (מסונן)' : '');
+  body.appendChild(count);
+
+  if (!items.length) {
+    const w = document.createElement('div'); w.className = 'empty-wrap';
+    const i = document.createElement('div'); i.className = 'empty-icon'; i.textContent = '📭';
+    const t = document.createElement('div'); t.className = 'empty-text';
+    t.textContent = q ? 'אין תוצאות לחיפוש' : 'אין תלושים פעילים';
+    w.append(i, t); body.appendChild(w);
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  items.forEach(({ ai, r }) => {
+    const sheetRow = ai + 1;
+    const empName = r[FUEL_EMP_COL] != null ? String(r[FUEL_EMP_COL]).trim() : '';
+    const assigned = empName !== '';
+    const cardNum = r[FUEL_CARD_COL] != null ? String(r[FUEL_CARD_COL]).trim() : '';
+    const balance = r[FUEL_BALANCE_COL] != null ? String(r[FUEL_BALANCE_COL]).trim() : '';
+
+    const card = document.createElement('div'); card.className = 'rec-card';
+
+    // כותרת כחולה — שם עובד (משויך) או מספר כרטיס (לא משויך)
+    const head = document.createElement('div'); head.className = 'rec-head';
+    head.textContent = (assigned ? empName : cardNum) || '—';
+    card.appendChild(head);
+
+    // יתרה
+    const fld = document.createElement('div'); fld.className = 'emp-field';
+    const l = document.createElement('div'); l.className = 'emp-lbl'; l.textContent = 'יתרה בכרטיס';
+    const v = document.createElement('div'); v.className = 'emp-val'; v.textContent = balance || '—';
+    if (!assigned) v.style.color = '#00FF00';  // ירוק בהיר רק לכרטיס לא משויך
+    fld.append(l, v); card.appendChild(fld);
+
+    if (assigned) {
+      buildFuelEditDetails(card, r, headers, sheetRow, key, all, empName);
+    } else {
+      const skip = new Set([FUEL_CARD_COL, FUEL_BALANCE_COL]);
+      buildExpandDetails(card, r, headers, skip);
+    }
+
+    frag.appendChild(card);
+  });
+  body.appendChild(frag);
+}
+
+// מספר הרכב האחרון של העובד — לפי התדלוק העדכני ביותר; אחרת השורה האחרונה
+function lastVehicleForEmployee(all, empName) {
+  if (!all || !empName) return '';
+  let best = '', bestTime = -Infinity, fallback = '';
+  for (let ai = 0; ai < all.length; ai++) {
+    const row = all[ai];
+    if (!row) continue;
+    const name = row[FUEL_EMP_COL] != null ? String(row[FUEL_EMP_COL]).trim() : '';
+    if (name !== empName) continue;
+    const veh = row[FUEL_VEHICLE_COL] != null ? String(row[FUEL_VEHICLE_COL]).trim() : '';
+    if (!veh) continue;
+    fallback = veh;
+    const d1 = toInputDate(row[FUEL_DATE1_COL]);
+    const d2 = toInputDate(row[FUEL_DATE2_COL]);
+    const t = Math.max(d1 ? Date.parse(d1) : -Infinity, d2 ? Date.parse(d2) : -Infinity);
+    if (t > bestTime) { bestTime = t; best = veh; }
+  }
+  return best || fallback;
+}
+
+// פרטים נוספים עם טופס עריכה (לכרטיס משויך)
+function buildFuelEditDetails(card, r, headers, sheetRow, key, all, empName) {
+  const details = document.createElement('div'); details.className = 'emp-details';
+
+  const form = document.createElement('div'); form.className = 'fuel-edit';
+  const ftitle = document.createElement('div'); ftitle.className = 'fuel-edit-title'; ftitle.textContent = 'עריכת תדלוקים';
+  form.appendChild(ftitle);
+
+  // ערכים קיימים / ברירות מחדל
+  const vehicle = (r[FUEL_VEHICLE_COL] != null ? String(r[FUEL_VEHICLE_COL]).trim() : '')
+                  || lastVehicleForEmployee(all, empName);
+  const date1 = toInputDate(r[FUEL_DATE1_COL]) || todayISO();
+  const amt1Existing = r[FUEL_AMT1_COL] != null ? String(r[FUEL_AMT1_COL]).trim() : '';
+  const amt1 = amt1Existing || String(FUEL_DEFAULT_AMT);
+  const date2 = toInputDate(r[FUEL_DATE2_COL]) || todayISO();
+  const amt2Existing = r[FUEL_AMT2_COL] != null ? String(r[FUEL_AMT2_COL]).trim() : '';
+  const amt2AutoMode = amt2Existing === '';
+  const amt2 = amt2Existing || String(Math.max(FUEL_DEFAULT_AMT - (parseFloat(amt1) || 0), 0));
+
+  const mkField = (labelTxt, type, val, placeholder) => {
+    const wrap = document.createElement('div'); wrap.className = 'fuel-edit-field';
+    const lab = document.createElement('label'); lab.textContent = labelTxt;
+    const inp = document.createElement('input'); inp.className = 'fuel-input'; inp.type = type; inp.value = val;
+    if (type === 'number') { inp.inputMode = 'decimal'; }
+    if (placeholder) inp.placeholder = placeholder;
+    wrap.append(lab, inp); form.appendChild(wrap);
+    return inp;
+  };
+
+  const inVehicle = mkField('מספר רכב', 'text', vehicle, '159-79-204');
+  const inDate1 = mkField('תאריך תדלוק ראשון', 'date', date1);
+  const inAmt1  = mkField('גובה תדלוק ראשון', 'number', amt1);
+  const inDate2 = mkField('תאריך תדלוק שני', 'date', date2);
+  const inAmt2  = mkField('גובה תדלוק שני', 'number', amt2);
+
+  // עדכון אוטומטי של תדלוק שני = 250 − ראשון, עד שהמשתמש משנה ידנית
+  let amt2Auto = amt2AutoMode;
+  inAmt1.addEventListener('input', () => {
+    if (amt2Auto) inAmt2.value = String(Math.max(FUEL_DEFAULT_AMT - (parseFloat(inAmt1.value) || 0), 0));
+  });
+  inAmt2.addEventListener('input', () => { amt2Auto = false; });
+
+  const saveBtn = document.createElement('button'); saveBtn.className = 'fuel-save'; saveBtn.textContent = 'שמור שינויים';
+  const msg = document.createElement('div'); msg.className = 'fuel-save-msg';
+  saveBtn.addEventListener('click', () => {
+    saveFuelRow(sheetRow, key, {
+      K: inVehicle.value,
+      I: isoToSheetDate(inDate1.value),
+      L: inAmt1.value,
+      J: isoToSheetDate(inDate2.value),
+      M: inAmt2.value
+    }, {
+      [FUEL_VEHICLE_COL]: inVehicle.value,
+      [FUEL_DATE1_COL]: isoToSheetDate(inDate1.value),
+      [FUEL_AMT1_COL]: inAmt1.value,
+      [FUEL_DATE2_COL]: isoToSheetDate(inDate2.value),
+      [FUEL_AMT2_COL]: inAmt2.value
+    }, saveBtn, msg);
+  });
+  form.appendChild(saveBtn);
+  form.appendChild(msg);
+  details.appendChild(form);
+
+  // שאר העמודות (קריאה בלבד) — מדלגים על שם העובד, יתרה והשדות הנערכים
+  const skip = new Set([FUEL_EMP_COL, FUEL_BALANCE_COL, FUEL_VEHICLE_COL, FUEL_DATE1_COL, FUEL_AMT1_COL, FUEL_DATE2_COL, FUEL_AMT2_COL]);
+  const rb = document.createElement('div'); rb.className = 'rec-body';
+  const maxCols = Math.max(headers.length, r.length);
+  for (let i = 0; i < maxCols; i++) {
+    if (skip.has(i)) continue;
+    const val = r[i] != null ? String(r[i]).trim() : '';
+    if (!val) continue;
+    const lbl = (headers[i] && headers[i].trim()) ? headers[i] : ('עמודה ' + (i + 1));
+    const f = document.createElement('div'); f.className = 'rec-field';
+    const ls = document.createElement('span'); ls.className = 'rec-lbl'; ls.textContent = lbl;
+    const vs = document.createElement('span'); vs.className = 'rec-val'; vs.textContent = val;
+    f.append(ls, vs); rb.appendChild(f);
+  }
+  details.appendChild(rb);
+
+  const btn = document.createElement('button'); btn.className = 'emp-expand';
+  const txt = document.createElement('span'); txt.textContent = 'פרטים נוספים / עריכה';
+  const arr = document.createElement('span'); arr.className = 'emp-arrow'; arr.textContent = '▾';
+  btn.append(txt, arr);
+  btn.addEventListener('click', () => {
+    const open = card.classList.toggle('open');
+    txt.textContent = open ? 'סגור' : 'פרטים נוספים / עריכה';
+  });
+  card.appendChild(btn);
+  card.appendChild(details);
+}
+
+// כתיבה חזרה לגיליון דרך ה-Apps Script
+async function saveFuelRow(sheetRow, key, updatesByLetter, updatesByIndex, btn, msg) {
+  if (!FUEL_WRITE_URL) {
+    msg.style.color = '#c0392b';
+    msg.textContent = 'השמירה לא מוגדרת עדיין (חסר חיבור Apps Script)';
+    return;
+  }
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.textContent = 'שומר...';
+  msg.style.color = 'var(--text-sub)';
+  msg.textContent = '';
+  const cfg = MODULES[key];
+  try {
+    const res = await fetch(FUEL_WRITE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ spreadsheetId: cfg.spreadsheetId, tab: cfg.tab, row: sheetRow, updates: updatesByLetter })
+    });
+    let ok = res.ok;
+    try { const j = await res.json(); if (j && j.ok === false) ok = false; if (j && j.error) throw new Error(j.error); } catch(_) {}
+    if (!ok) throw new Error('שמירה נכשלה');
+    // עדכון מקומי מיידי כך שהאפליקציה משקפת את הגיליון
+    const all = moduleCache[key];
+    if (all && all[sheetRow - 1]) {
+      const row = all[sheetRow - 1];
+      Object.keys(updatesByIndex).forEach(idx => { row[+idx] = updatesByIndex[idx]; });
+    }
+    msg.style.color = 'var(--green)';
+    msg.textContent = '✓ נשמר בהצלחה';
+    // רענון מהקובץ לאחר הצגת האישור — היתרה (עמודה N) מחושבת בגיליון,
+    // וכך תלוש שהגיע ל-0 ייעלם מהרשימה
+    setTimeout(() => { if (currentModule === key) loadModule(key, true); }, 1200);
+  } catch(e) {
+    msg.style.color = '#c0392b';
+    msg.textContent = '⚠️ ' + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = orig;
+}
+
+function renderModuleData(key) {
+  if (currentModule !== key) return;
+  const cfg = MODULES[key];
+  const body = document.getElementById('module-body');
+  const all = moduleCache[key] || [];
+  const hr = cfg.headerRow || 1;
+  const headers = (all[hr - 1] || []).map(h => (h == null ? '' : String(h)));
+  let rows = all.slice(hr).filter(r => r && r.some(c => c != null && String(c).trim() !== ''));
+  // הסתרת שורות שהיתרה בעמודה שהוגדרה היא 0 (תלושי דלק)
+  if (cfg.hideZeroCol != null) {
+    rows = rows.filter(r => {
+      const num = parseFloat(String(r[cfg.hideZeroCol] == null ? '' : r[cfg.hideZeroCol]).replace(/[^\d.\-]/g, ''));
+      return !(Number.isFinite(num) && num === 0);
+    });
+  }
+  const q = (moduleSearchQ[key] || '').trim().toLowerCase();
+  if (q) rows = rows.filter(r => r.some(c => c != null && String(c).toLowerCase().includes(q)));
+
+  body.innerHTML = '';
+  const count = document.createElement('div');
+  count.className = 'module-count';
+  count.textContent = rows.length + ' רשומות' + (q ? ' (מתוך ' + (all.length - hr) + ')' : '');
+  body.appendChild(count);
+
+  if (!rows.length) {
+    const w = document.createElement('div'); w.className = 'empty-wrap';
+    const i = document.createElement('div'); i.className = 'empty-icon'; i.textContent = '📭';
+    const t = document.createElement('div'); t.className = 'empty-text';
+    t.textContent = q ? 'אין תוצאות לחיפוש' : 'אין נתונים בלשונית';
+    w.append(i, t); body.appendChild(w);
+    return;
+  }
+
+  const titleIdx = cfg.titleCol != null ? cfg.titleCol : 0;
+  const frag = document.createDocumentFragment();
+  rows.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'rec-card';
+    const head = document.createElement('div');
+    head.className = 'rec-head';
+    let titleVal = r[titleIdx] != null ? String(r[titleIdx]).trim() : '';
+    if (!titleVal) { const f = r.find(c => c != null && String(c).trim() !== ''); titleVal = f != null ? String(f) : '—'; }
+    head.textContent = titleVal;
+    card.appendChild(head);
+    const rb = document.createElement('div');
+    rb.className = 'rec-body';
+    const maxCols = Math.max(headers.length, r.length);
+    for (let i = 0; i < maxCols; i++) {
+      if (i === titleIdx) continue;
+      const val = r[i] != null ? String(r[i]).trim() : '';
+      if (!val) continue;
+      const lbl = (headers[i] && headers[i].trim()) ? headers[i] : ('עמודה ' + (i + 1));
+      const f = document.createElement('div'); f.className = 'rec-field';
+      const ls = document.createElement('span'); ls.className = 'rec-lbl'; ls.textContent = lbl;
+      const vs = document.createElement('span'); vs.className = 'rec-val'; vs.textContent = val;
+      f.append(ls, vs); rb.appendChild(f);
+    }
+    card.appendChild(rb);
+    frag.appendChild(card);
+  });
+  body.appendChild(frag);
 }
 
 // ═══════════════════════════════════════
@@ -449,14 +1285,21 @@ document.getElementById('btn-connect').onclick = async () => {
   const errEl = document.getElementById('setup-err');
   const btn   = document.getElementById('btn-connect');
   errEl.style.color = '#888';
-  btn.textContent = 'מתחבר לנתונים...';
+  btn.textContent = 'שלב 1: בודק חיבור...';
   btn.disabled = true;
   try {
-    errEl.textContent = 'מושך נתונים מגיליון המאסטר...';
+    // Step 1: simple test
+    errEl.textContent = 'שלב 1: בודק גישה לגיליון...';
+    const testUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=spreadsheetId`;
+    const testRes = await fetch(testUrl);
+    const testJson = await testRes.json();
+    if (!testRes.ok) throw new Error(`שלב 1 נכשל (${testRes.status}): ${testJson.error?.message}`);
+    errEl.textContent = 'שלב 2: טוען לשוניות...';
+    // Step 2: load data
     await loadAllData();
     errEl.style.color = '';
     errEl.textContent = '';
-    showScreen('s-home');
+    showScreen('s-landing');
   } catch(e) {
     errEl.style.color = '#c0392b';
     errEl.textContent = '⚠️ ' + e.message;
@@ -467,10 +1310,103 @@ document.getElementById('btn-connect').onclick = async () => {
 };
 
 // ═══════════════════════════════════════
-// FETCH MASTER SHEET DATA
+// RESCAN — סריקת לשוניות חדשות
 // ═══════════════════════════════════════
+// ליבת הסריקה — מאפסת זיכרון לשוניות וטוענת מחדש
+async function rescanNewSheets() {
+  if (!API_KEY || API_KEY === 'YOUR_API_KEY_HERE') return { ok: false, msg: 'יש להתחבר תחילה' };
+  knownSheets = [];
+  ignoredSheets = [];
+  localStorage.removeItem('mtz_known');
+  localStorage.removeItem('mtz_ignored');
+  await loadAllData();
+  return { ok: true };
+}
+
+// שדה כתובת ה-Apps Script לשמירה
+(function () {
+  const el = document.getElementById('inp-write-url');
+  if (el) {
+    el.value = FUEL_WRITE_URL;
+    el.addEventListener('change', () => {
+      FUEL_WRITE_URL = el.value.trim();
+      localStorage.setItem('mtz_fuel_write_url', FUEL_WRITE_URL);
+    });
+  }
+})();
+
+// כפתור הסריקה בסרגל "מלאי למכירה"
+document.getElementById('home-rescan').onclick = async e => {
+  const btn = e.currentTarget;
+  if (btn.disabled) return;
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  try {
+    const res = await rescanNewSheets();
+    if (!res.ok) alert(res.msg);
+  } catch(err) {
+    alert('שגיאה בסריקה: ' + err.message);
+  }
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+};
+
+// רענון מודול נוכחי (עובדים / דלק / שכירויות)
+document.getElementById('module-refresh').onclick = () => {
+  if (currentModule) loadModule(currentModule, true);
+};
+
+// ═══════════════════════════════════════
+// FETCH
+// ═══════════════════════════════════════
+async function fetchSheet(name) {
+  const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
+  const range = SHEET_RANGES[name];
+  if (range) {
+    const hUrl = base + encodeURIComponent(name) + `!A${range.headerRow}:AZ${range.headerRow}` + `?key=${API_KEY}`;
+    const dUrl = base + encodeURIComponent(name) + `!A${range.dataStart}:AZ${range.dataEnd}`   + `?key=${API_KEY}`;
+    const hRes = await fetch(hUrl);
+    if (!hRes.ok) { const e = await hRes.json(); throw new Error(e.error?.message || 'שגיאה'); }
+    const hJson = await hRes.json();
+    const dRes = await fetch(dUrl);
+    if (!dRes.ok) { const e = await dRes.json(); throw new Error(e.error?.message || 'שגיאה'); }
+    const dJson = await dRes.json();
+    const headers = (hJson.values || [[]])[0];
+    const data    = dJson.values || [];
+    return [headers, ...data];
+  } else {
+    const r = await fetch(base + encodeURIComponent(name) + `?key=${API_KEY}`);
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'שגיאה'); }
+    return (await r.json()).values || [];
+  }
+}
+
+async function fetchAllSheetNames() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=sheets.properties.title`;
+  const r = await fetch(url);
+  if (!r.ok) { const e=await r.json(); throw new Error(e.error?.message||'שגיאה'); }
+  return (await r.json()).sheets.map(s => s.properties.title);
+}
+
+function parseRows(values, sheetName) {
+  if (!values || values.length < 2) return [];
+  const headers = values[0];
+  return values.slice(1).map(row => {
+    const o = { _sheet: sheetName };
+    headers.forEach((h,i) => { o[h] = (row[i]||'').toString().trim(); });
+    // map by position too
+    row.forEach((v,i) => { o['_c'+i] = v ? v.toString().trim() : ''; });
+    return o;
+  }).filter(r => r['_c'+COL.APT] || r['_c'+COL.STATUS]);
+}
+
 function getVal(row, colIdx) { return row['_c'+colIdx] || ''; }
-function parsePrice(v) { if (!v) return 0; return parseFloat(v.replace(/[^\d.]/g,'')) || 0; }
+
+function parsePrice(v) {
+  if (!v) return 0;
+  return parseFloat(v.replace(/[^\d.]/g,'')) || 0;
+}
+
 function fmtPrice(n) {
   if (!n) return '—';
   if (n >= 1000000) return '₪' + (n/1000000).toFixed(2) + 'M';
@@ -479,47 +1415,101 @@ function fmtPrice(n) {
 
 async function loadAllData() {
   allData = {};
-  activeProjects = [];
-
-  const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
-  const url = base + encodeURIComponent(MASTER_SHEET_NAME) + `!A1:AZ?key=${API_KEY}`;
-  
-  const r = await fetch(url);
-  if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'שגיאה במשיכת נתונים'); }
-  
-  const json = await r.json();
-  const values = json.values || [];
-
-  if (values.length < 2) {
-    renderHome();
-    return;
+  const allNames = await fetchAllSheetNames();
+  const newSheets = allNames.filter(n => !RELEVANT_SHEETS.includes(n) && !knownSheets.includes(n) && !ignoredSheets.includes(n) && !activeProjects.includes(n));
+  newSheets.forEach(n => { if (!knownSheets.includes(n)) knownSheets.push(n); });
+  localStorage.setItem('mtz_known', JSON.stringify(knownSheets));
+  for (const name of activeProjects) {
+    if (!allNames.includes(name)) continue;
+    const vals = await fetchSheet(name);
+    allData[name] = parseRows(vals, name);
   }
-
-  const headers = values[0];
-  const rows = values.slice(1);
-
-  // חלוקת הנתונים לפרויקטים השונים בצורה אוטומטית
-  rows.forEach(row => {
-    const pName = (row[COL.PROJECT_NAME] || '').toString().trim();
-    if (!pName) return; // מתעלם משורות ללא שם פרויקט
-
-    if (!allData[pName]) {
-      allData[pName] = [];
-      if (!activeProjects.includes(pName)) activeProjects.push(pName);
-    }
-
-    // יצירת אובייקט הדירה
-    const o = { _sheet: pName };
-    headers.forEach((h, i) => { o[h] = (row[i] || '').toString().trim(); });
-    row.forEach((v, i) => { o['_c'+i] = v ? v.toString().trim() : ''; });
-
-    // מוסיף למערך רק אם יש מספר דירה או סטטוס (סינון שורות ריקות)
-    if (o['_c'+COL.APT] || o['_c'+COL.STATUS]) {
-      allData[pName].push(o);
-    }
+  // DEBUG: log unique status values per sheet
+  Object.entries(allData).forEach(([name, rows]) => {
+    const statuses = [...new Set(rows.map(r => getVal(r, COL.STATUS)))].filter(Boolean);
+    console.log('STATUSES in', name, ':', statuses);
+    const l2 = rows.filter(r => getVal(r,COL.STATUS).includes('שלב'));
+    console.log('  Land2 rows:', l2.length, l2.slice(0,2).map(r=>getVal(r,COL.STATUS)));
   });
-
   renderHome();
+  checkNewSheets(newSheets.filter(n => !ignoredSheets.includes(n)));
+}
+
+// ═══════════════════════════════════════
+// NEW SHEET DETECTION
+// ═══════════════════════════════════════
+function checkNewSheets(newOnes) {
+  const cont = document.getElementById('new-banners');
+  cont.innerHTML = '';
+  newOnes.forEach(name => {
+    const div = document.createElement('div');
+    div.className = 'new-banner';
+    const span = document.createElement('span');
+    span.className = 'nb-text';
+    span.appendChild(document.createTextNode('לשונית חדשה זוהתה: '));
+    const b = document.createElement('b'); b.textContent = name; span.appendChild(b);
+    span.appendChild(document.createTextNode(' — להוסיף כפרויקט?'));
+    const yes = document.createElement('button');
+    yes.className = 'nb-btn nb-yes'; yes.textContent = 'כן';
+    yes.addEventListener('click', () => addProject(name, div));
+    const no = document.createElement('button');
+    no.className = 'nb-btn nb-no'; no.textContent = 'לא';
+    no.addEventListener('click', () => ignoreSheet(name, div));
+    div.append(span, yes, no);
+    cont.appendChild(div);
+  });
+}
+
+function addProject(name, el) {
+  // ask for row range before adding
+  el.innerHTML = '';
+  const label = document.createElement('span');
+  label.className = 'nb-text';
+  const b = document.createElement('b'); b.textContent = name; label.appendChild(b);
+  label.appendChild(document.createTextNode(' — הגדר טווח שורות:'));
+
+  const mkField = (txt, val, w) => {
+    const s = document.createElement('span');
+    s.style.cssText = 'font-size:12px;color:#fff;margin-left:6px;';
+    s.textContent = txt;
+    const i = document.createElement('input');
+    i.type = 'number'; i.value = val;
+    i.style.cssText = `width:${w}px;border-radius:6px;border:none;padding:4px 6px;font-size:13px;text-align:center;`;
+    return [s, i];
+  };
+  const [hl, hi] = mkField('שורת כותרות:', 1, 44);
+  const [sl, si] = mkField('נתונים משורה:', 2, 44);
+  const [dl, di] = mkField('עד שורה:', 200, 54);
+
+  const ok = document.createElement('button');
+  ok.className = 'nb-btn nb-yes'; ok.textContent = 'אישור';
+  ok.addEventListener('click', () => confirmAddProject(name, el, {
+    headerRow: parseInt(hi.value) || 1,
+    dataStart: parseInt(si.value) || 2,
+    dataEnd:   parseInt(di.value) || 200
+  }));
+  const cancel = document.createElement('button');
+  cancel.className = 'nb-btn nb-no'; cancel.textContent = 'ביטול';
+  cancel.addEventListener('click', () => ignoreSheet(name, el));
+
+  el.append(label, hl, hi, sl, si, dl, di, ok, cancel);
+}
+
+async function confirmAddProject(name, el, range) {
+  SHEET_RANGES[name] = range;
+  saveRanges();
+  if (!activeProjects.includes(name)) activeProjects.push(name);
+  localStorage.setItem('mtz_active_projects', JSON.stringify(activeProjects));
+  el.remove();
+  const vals = await fetchSheet(name);
+  allData[name] = parseRows(vals, name);
+  renderHome();
+}
+
+function ignoreSheet(name, el) {
+  if (!ignoredSheets.includes(name)) ignoredSheets.push(name);
+  localStorage.setItem('mtz_ignored', JSON.stringify(ignoredSheets));
+  el.remove();
 }
 
 // ═══════════════════════════════════════
@@ -531,11 +1521,17 @@ function isSold(row) { return getStatus(row) === STATUS.SOLD; }
 function isReq(row) { return getStatus(row) === STATUS.REQ; }
 function isLand(row) {
   const s = (getStatus(row) || '').trim();
-  return (s === STATUS.LAND || s === 'ב.קרקע') && !s.includes('שלב');
+  return (s === STATUS.LAND || s === 'ב.קרקע')
+    && !s.includes('שלב');
 }
 function isLand2(row) {
   const s = (getStatus(row) || '').trim();
-  return s === STATUS.LAND2 || s === 'ב.קרקע משלב ב' || s === 'ב.קרקע  משלב ב' || (s.startsWith('ב.קרקע') && s.includes('שלב')) || (s.includes('קרקע') && s.includes('שלב'));
+  // match any variation: 'ב.קרקע משלב ב', 'ב.קרקע משלב ב', etc.
+  return s === STATUS.LAND2
+    || s === 'ב.קרקע משלב ב'
+    || s === 'ב.קרקע  משלב ב'
+    || (s.startsWith('ב.קרקע') && s.includes('שלב'))
+    || (s.includes('קרקע') && s.includes('שלב'));
 }
 function isRent(row) { return getStatus(row) === STATUS.RENT; }
 function isAvail(row) { return getStatus(row) === STATUS.AVAIL; }
@@ -547,10 +1543,14 @@ function projectStats(rows) {
   const req = rows.filter(isReq);
   const avail = rows.filter(isAvail);
   const pct = forSale.length ? Math.round(sold.length / forSale.length * 100) : 0;
-  
+  const curYear = new Date().getFullYear().toString();
+  const soldThisYear = sold.filter(r => {
+    const d = getVal(r, COL.DATE_SIGN) || getVal(r, COL.DATE_SIGN_EXP);
+    return d.includes(curYear);
+  }).length;
   let revenue = 0;
   rows.forEach(r => { revenue += parsePrice(getVal(r, COL.PRICE_SALE)); });
-  return { total: rows.length, forSale: forSale.length, sold: sold.length, req: req.length, avail: avail.length, pct, revenue };
+  return { total: rows.length, forSale: forSale.length, sold: sold.length, req: req.length, avail: avail.length, pct, soldThisYear, revenue };
 }
 
 function buildingStats(rows) {
@@ -594,24 +1594,22 @@ function tagClass(row) {
 function renderHome() {
   const body = document.getElementById('home-body');
   body.innerHTML = '';
-  
-  if (!activeProjects.length) {
-    body.innerHTML = '<div class="empty-wrap"><div class="empty-icon">📂</div><div class="empty-text">אין פרויקטים בגיליון המאסטר</div></div>';
+  if (!Object.keys(allData).length) {
+    body.innerHTML = '<div class="empty-wrap"><div class="empty-icon">📂</div><div class="empty-text">אין פרויקטים לטעינה</div></div>';
     return;
   }
-  
   activeProjects.forEach(name => {
     const rows = allData[name];
-    if (!rows || !rows.length) return;
+    if (!rows) return;
     const st = projectStats(rows);
+    const dname = DISPLAY_NAMES[name] || name;
     const dash = Math.round(st.pct * 113 / 100);
-    
     const card = document.createElement('div');
     card.className = 'proj-card';
     card.innerHTML = `
       <div class="pc-head">
         <div style="flex:1">
-          <div class="pc-name">${name}</div>
+          <div class="pc-name">${dname}</div>
           <div class="pc-sub">${st.total} יח"ד סה"כ · ${st.forSale} למכירה</div>
           <div style="margin-top:8px;background:rgba(255,255,255,0.1);border-radius:8px;padding:7px 10px;display:inline-block;">
             <div style="font-size:10px;color:rgba(255,255,255,.55);">הכנסות ממכירות</div>
@@ -647,7 +1645,8 @@ let projRoomFilter = 'all';
 function openProject(name) {
   activeProject = name;
   projRoomFilter = 'all';
-  document.getElementById('proj-title').textContent = name;
+  const dname = DISPLAY_NAMES[name] || name;
+  document.getElementById('proj-title').textContent = dname;
   showScreen('s-project');
   renderProjectPage(name);
 }
@@ -658,6 +1657,7 @@ function renderProjectPage(name) {
   const body = document.getElementById('proj-body');
   body.innerHTML = '';
 
+  // room filter bar
   const roomSet = new Set();
   rows.forEach(r => { const rm = getVal(r,COL.ROOMS); if(rm) roomSet.add(rm); });
   const roomsSorted = [...roomSet].sort((a,b) => parseFloat(a)-parseFloat(b));
@@ -683,6 +1683,7 @@ function renderProjectPage(name) {
   document.getElementById('proj-sub').textContent = `${Object.keys(buildings).length} בניינים · ${rows.length} יח"ד`;
 
   Object.entries(buildings).forEach(([bldName, brows]) => {
+    // apply room filter
     const filtered = projRoomFilter === 'all' ? brows : brows.filter(r => getVal(r,COL.ROOMS) === projRoomFilter);
     const allBrows = brows;
 
@@ -695,7 +1696,7 @@ function renderProjectPage(name) {
     const pct   = forSale ? Math.round(sold / forSale * 100) : 0;
     const total = filtered.length;
 
-    if (total === 0) return;
+    if (total === 0) return; // hide buildings with no matching rooms when filtered
 
     const card = document.createElement('div');
     card.className = 'bld-card';
@@ -725,9 +1726,16 @@ function renderProjectPage(name) {
 // ═══════════════════════════════════════
 // BUILDING PAGE
 // ═══════════════════════════════════════
+// כיוונים כפי שכתובים בגיליון (ללא מקפים, ייתכן פסיק בין כיוונים מרובים)
+// הפונקציה normalizeDir מנרמלת את הערך לצורך השוואה
 const DIR_ORDER = ['צפון מערב','צפון מזרח','דרום מערב','דרום מזרח','צפון','דרום','מזרח','מערב'];
 
-function normalizeDir(d) { return (d||'').replace(/-/g,' ').replace(/\s+/,' ').trim(); }
+// נרמול כיוון: מסיר מקפים, חותך רווחים, lowercase-ish
+function normalizeDir(d) {
+  return (d||'').replace(/-/g,' ').replace(/\s+/,' ').trim();
+}
+
+// מחזיר רשימת כיוונים עבור דירה (יכולה להיות מרובים מופרדים בפסיק)
 function getDirs(row) {
   const raw = (getVal(row, COL.DIRS)||'').trim();
   if (!raw) return [''];
@@ -738,7 +1746,7 @@ function openBuilding(projName, bldName, rows) {
   activeBuilding = { projName, bldName, rows };
   currentRoomFilter = 'all';
   document.getElementById('bld-title').textContent = bldName;
-  document.getElementById('bld-sub').textContent = projName + ' · ' + rows.length + ' יח"ד';
+  document.getElementById('bld-sub').textContent = (DISPLAY_NAMES[projName]||projName) + ' · ' + rows.length + ' יח"ד';
   showScreen('s-building');
   buildRoomFilter(rows);
   renderBuildingGrid(rows);
@@ -774,30 +1782,47 @@ function renderBuildingGrid(rows) {
   const grid = document.getElementById('bld-grid');
   grid.innerHTML = '';
 
+  // ── 1. אסוף כל כיוונים קיימים (מנורמלים) ─────────────────
   const dirSet = new Set();
-  rows.forEach(r => { getDirs(r).forEach(d => dirSet.add(d)); });
-  const dirs = [ ...DIR_ORDER.filter(d => dirSet.has(d)), ...[...dirSet].filter(d => !DIR_ORDER.includes(d) && d !== '') ];
-  if (dirSet.has('') || dirs.length === 0) dirs.push('');
+  rows.forEach(r => {
+    getDirs(r).forEach(d => dirSet.add(d));
+  });
+  // סדר לפי DIR_ORDER, שאר כיוונים בסוף
+  const dirs = [
+    ...DIR_ORDER.filter(d => dirSet.has(d)),
+    ...[...dirSet].filter(d => !DIR_ORDER.includes(d) && d !== '')
+  ];
+  const hasEmpty = dirSet.has('');
+  if (hasEmpty || dirs.length === 0) dirs.push('');
 
+  // ── 2. בנה מפת קומות: floorMap[fl][dir] = [rows] ──────────
   const floorMap = {};
   rows.forEach(r => {
     const fl = (getVal(r, COL.FLOOR)||'').trim() || '0';
     if (!floorMap[fl]) floorMap[fl] = {};
     dirs.forEach(d => { if (!floorMap[fl][d]) floorMap[fl][d] = []; });
-    const targetDir = getDirs(r).find(d => dirs.includes(d)) || '';
+    const rowDirs = getDirs(r);
+    // דירה עם כיוון יחיד — שים בעמודה שלה
+    // דירה עם מספר כיוונים — שים בעמודה הראשונה שמופיעה
+    const targetDir = rowDirs.find(d => dirs.includes(d)) || '';
     if (!floorMap[fl][targetDir]) floorMap[fl][targetDir] = [];
     floorMap[fl][targetDir].push(r);
   });
 
+  // ── 3. מיין קומות מהגבוהה לנמוכה ──────────────────────────
   const floors = Object.keys(floorMap).sort((a, b) => {
     const na = parseFloat(a), nb = parseFloat(b);
     if (!isNaN(na) && !isNaN(nb)) return nb - na;
     return b.localeCompare(a, 'he');
   });
 
+  // ── 4. MAX דירות לכל כיוון (קובע רוחב עמודה) ──────────────
   const maxPerDir = {};
-  dirs.forEach(d => { maxPerDir[d] = Math.max(1, ...floors.map(fl => (floorMap[fl][d]||[]).length)); });
+  dirs.forEach(d => {
+    maxPerDir[d] = Math.max(1, ...floors.map(fl => (floorMap[fl][d]||[]).length));
+  });
 
+  // ── 5. כותרות כיוונים ──────────────────────────────────────
   if (dirs.filter(d=>d).length > 0) {
     const hdrRow = document.createElement('div');
     hdrRow.style.cssText = 'display:flex;gap:4px;margin-bottom:6px;padding-right:28px;';
@@ -811,6 +1836,7 @@ function renderBuildingGrid(rows) {
     grid.appendChild(hdrRow);
   }
 
+  // ── 6. שורות קומה ──────────────────────────────────────────
   floors.forEach(fl => {
     const flRow = document.createElement('div');
     flRow.className = 'floor-row';
@@ -824,7 +1850,7 @@ function renderBuildingGrid(rows) {
     aptsWrap.className = 'floor-apts';
 
     dirs.forEach(d => {
-      const apts = floorMap[fl][d] || [];
+      const apts    = floorMap[fl][d] || [];
       const colSpan = maxPerDir[d];
       const dirWrap = document.createElement('div');
       dirWrap.style.cssText = `flex:${colSpan};display:flex;gap:4px;min-width:0;`;
@@ -835,6 +1861,7 @@ function renderBuildingGrid(rows) {
         empty.style.flex = '1';
         dirWrap.appendChild(empty);
       } else {
+        // ריווח שווה: כל דירה תופסת flex=colSpan/actual
         const flexVal = colSpan / apts.length;
         apts.forEach(r => {
           const rooms = getVal(r, COL.ROOMS);
@@ -853,13 +1880,17 @@ function renderBuildingGrid(rows) {
       }
       aptsWrap.appendChild(dirWrap);
     });
+
     flRow.appendChild(aptsWrap);
     grid.appendChild(flRow);
   });
 }
 
+
+
 function shortenDir(d) {
   if (!d) return '';
+  // handle comma-separated multi-dirs
   return d.split(/[,،]/).map(p => {
     const t = normalizeDir(p);
     return t.replace('צפון מערב','צ-מע').replace('צפון מזרח','צ-מז')
@@ -874,7 +1905,7 @@ function shortenDir(d) {
 // ═══════════════════════════════════════
 function openAptModal(row) {
   const aptNum = getVal(row, COL.APT);
-  const projName = row._sheet;
+  const projName = DISPLAY_NAMES[row._sheet] || row._sheet;
   const bld = getVal(row, COL.BUILDING);
   const fl = getVal(row, COL.FLOOR);
   const status = getStatus(row);
@@ -896,7 +1927,7 @@ function openAptModal(row) {
     ['מרפסת כללי',  v(COL.BALCONY)      ? v(COL.BALCONY)+' מ"ר'       : ''],
     ['מרפסת צידית', v(COL.BALCONY_SIDE) ? v(COL.BALCONY_SIDE)+' מ"ר'  : ''],
     ['מרפסת גג',    v(COL.BALCONY_ROOF) ? v(COL.BALCONY_ROOF)+' מ"ר'  : ''],
-    ['שטח גינה',    v(COL.GARDEN)       ? v(COL.GARDEN)+' מ"ר'        : ''],
+    ['שטח גינה',    v(COL.GARDEN)       ? v(COL.GARDEN)+' מ"ר'         : ''],
     ['כיוונים',     v(COL.DIRS)],
     ['רוכשים',      v(COL.BUYERS)],
     ['חניה',        v(COL.PARKING)],
@@ -969,6 +2000,7 @@ function renderSearch(results, q, showRevenue) {
     showScreen('s-search'); return;
   }
 
+  // סיכום סטטוס — תמיד מוצג
   const statusCounts = {};
   results.forEach(r => {
     const s = getStatus(r) || 'לא ידוע';
@@ -993,6 +2025,7 @@ function renderSearch(results, q, showRevenue) {
   sumDiv.innerHTML = '<div style="font-size:11px;color:var(--text-sub);margin-bottom:7px;">סה"כ '+results.length+' נכסים</div><div style="display:flex;flex-wrap:wrap;gap:6px;">'+chips+'</div>';
   body.appendChild(sumDiv);
 
+  // Revenue summary box (only for year/quarter filter)
   if (showRevenue) {
     let totalRev = 0;
     let countWithPrice = 0;
@@ -1038,7 +2071,7 @@ function renderSearch(results, q, showRevenue) {
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div>
           <div class="result-apt">דירה ${aptNum}${bld?' – '+bld:''}</div>
-          <div class="result-proj">${r._sheet}${fl?' · קומה '+fl:''}</div>
+          <div class="result-proj">${DISPLAY_NAMES[r._sheet]||r._sheet}${fl?' · קומה '+fl:''}</div>
         </div>
         ${showRevenue && price ? `<div style="font-size:15px;font-weight:700;color:var(--blue-dark);">${fmtPrice(price)}</div>` : ''}
       </div>
@@ -1067,16 +2100,18 @@ function closeFilterIfOutside(e) {
 }
 
 function buildFilterChips() {
+  // projects
   const fp = document.getElementById('f-projects');
   fp.innerHTML = '';
   activeProjects.forEach(p => {
     const c = document.createElement('button');
     c.className = 'chip' + (filters.projects.includes(p)?' on':'');
-    c.textContent = p;
+    c.textContent = DISPLAY_NAMES[p]||p;
     c.onclick = () => { c.classList.toggle('on'); toggleArr(filters.projects, p); };
     fp.appendChild(c);
   });
 
+  // status
   const fs = document.getElementById('f-status');
   fs.innerHTML = '';
   [STATUS.SOLD,STATUS.REQ,STATUS.AVAIL,STATUS.LAND,STATUS.LAND2,STATUS.RENT].forEach(st => {
@@ -1087,6 +2122,7 @@ function buildFilterChips() {
     fs.appendChild(c);
   });
 
+  // rooms
   const fr = document.getElementById('f-rooms');
   fr.innerHTML = '';
   const roomSet = new Set();
@@ -1099,6 +2135,7 @@ function buildFilterChips() {
     fr.appendChild(c);
   });
 
+  // dirs
   const fd = document.getElementById('f-dirs');
   fd.innerHTML = '';
   DIR_ORDER.filter(d=>d && d!=='').forEach(d => {
@@ -1144,6 +2181,7 @@ function applyFilters() {
   updateFilterCount();
   document.getElementById('filter-panel').classList.remove('open');
 
+  // run filter search
   let rows = allRows();
   if (filters.projects.length) rows = rows.filter(r => filters.projects.includes(r._sheet));
   if (filters.status.length) rows = rows.filter(r => {
@@ -1181,10 +2219,11 @@ function applyFilters() {
     rows = rows.filter(r => {
       const d = getVal(r,COL.DATE_SIGN) || getVal(r,COL.DATE_SIGN_EXP) || getVal(r,COL.DATE_REQ);
       if (!d) return false;
+      // try DD/MM/YYYY or MM/YYYY
       const parts = d.split(/[\/\-.]/);
       let month = null;
-      if (parts.length >= 3) month = parts[1]; 
-      else if (parts.length === 2) month = parts[0]; 
+      if (parts.length >= 3) month = parts[1]; // DD/MM/YYYY
+      else if (parts.length === 2) month = parts[0]; // MM/YYYY
       if (!month) return false;
       const q = MONTH_QUARTER[month.replace(/^0/,'')];
       return q && filters.quarters.includes(String(q));
