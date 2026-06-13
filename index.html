@@ -210,6 +210,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 .module-count{font-size:12px;color:var(--text-sub);padding:2px 2px 10px;}
 .rec-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden;}
 .rec-head{background:var(--blue-mid);color:#fff;font-weight:700;font-size:14px;padding:10px 13px;}
+.rec-head-gold{background:var(--gold);}
 .rec-body{padding:6px 13px 8px;}
 .rec-field{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
 .rec-field:last-child{border-bottom:none;}
@@ -259,6 +260,8 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 .fuel-save:active{opacity:.88;}
 .fuel-save:disabled{opacity:.55;}
 .fuel-save-msg{font-size:12px;text-align:center;margin-top:7px;min-height:14px;font-weight:600;}
+.fuel-phone-row{display:flex;align-items:center;gap:10px;}
+.fuel-phone-row .fuel-input{flex:1;min-width:0;}
 
 /* NEW SHEET BANNER */
 .new-banner{background:var(--gold);color:#fff;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:13px;flex-wrap:wrap;}
@@ -959,6 +962,9 @@ const FUEL_AMT1_COL  = 11;   // עמודה L — גובה תדלוק ראשון
 const FUEL_DATE2_COL = 9;    // עמודה J — תאריך תדלוק שני
 const FUEL_AMT2_COL  = 12;   // עמודה M — גובה תדלוק שני
 const FUEL_VEHICLE_COL = 10; // עמודה K — מספר רכב
+const FUEL_CODE_COL = 1;     // עמודה B — קוד התלוש (להודעת וואטסאפ)
+const FUEL_PHONE_COL = 6;    // עמודה G — נייד העובד
+const FUEL_DELIVERY_COL = 7; // עמודה H — תאריך מסירת התלוש
 const FUEL_DEFAULT_AMT = 250;
 
 // כתובת ה-Apps Script לכתיבה חזרה לגיליון (מוטמעת; ניתנת לעדכון בהגדרות)
@@ -993,6 +999,9 @@ function renderFuel(key) {
   const all = moduleCache[key] || [];
   const hr = cfg.headerRow || 1;
   const headers = (all[hr - 1] || []).map(h => (h == null ? '' : String(h)));
+
+  // רשימת שמות קיימים בעמודה F (לשיוך — מופיעים כהצעות)
+  const fuelNames = [...new Set(all.slice(hr).map(row => (row && row[FUEL_EMP_COL] != null) ? String(row[FUEL_EMP_COL]).trim() : '').filter(Boolean))].sort((a, b) => a.localeCompare(b, 'he'));
 
   // איסוף שורות נתונים עם שמירת מספר השורה האמיתי בגיליון (ai+1)
   let items = [];
@@ -1035,8 +1044,9 @@ function renderFuel(key) {
 
     const card = document.createElement('div'); card.className = 'rec-card';
 
-    // כותרת כחולה — שם עובד (משויך) או מספר כרטיס (לא משויך)
+    // כותרת — שם עובד (משויך, רקע זהב) או מספר כרטיס (לא משויך, רקע כחול)
     const head = document.createElement('div'); head.className = 'rec-head';
+    if (assigned) head.classList.add('rec-head-gold');
     head.textContent = (assigned ? empName : cardNum) || '—';
     card.appendChild(head);
 
@@ -1050,13 +1060,215 @@ function renderFuel(key) {
     if (assigned) {
       buildFuelEditDetails(card, r, headers, sheetRow, key, all, empName);
     } else {
-      const skip = new Set([FUEL_CARD_COL, FUEL_BALANCE_COL]);
-      buildExpandDetails(card, r, headers, skip);
+      buildFuelAssignDetails(card, r, headers, sheetRow, key, fuelNames, all);
     }
 
     frag.appendChild(card);
   });
   body.appendChild(frag);
+}
+
+// אייקון וואטסאפ (טלפון לבן על ירוק)
+const WA_SVG = '<svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>';
+
+// מפת שם עובד (שם מלא, עמודה A בעובדים) -> נייד (עמודה AP), לטעינת מספר אוטומטית
+let employeesPhoneMap = null;
+async function ensureEmployeesPhoneMap() {
+  if (employeesPhoneMap) return employeesPhoneMap;
+  const cfg = MODULES.employees;
+  try {
+    let all = moduleCache.employees;
+    if (!all) { all = await fetchTab(cfg.spreadsheetId, cfg.tab); moduleCache.employees = all; }
+    const hr = cfg.headerRow || 1;
+    const map = {};
+    for (let i = hr; i < all.length; i++) {
+      const row = all[i]; if (!row) continue;
+      const name = row[EMP_TITLE_COL] != null ? String(row[EMP_TITLE_COL]).trim() : '';
+      const phone = row[EMP_PHONE_COL] != null ? String(row[EMP_PHONE_COL]).trim() : '';
+      if (name) map[name] = phone;
+    }
+    employeesPhoneMap = map;
+  } catch (e) {
+    employeesPhoneMap = {};
+  }
+  return employeesPhoneMap;
+}
+
+// מטמון נייד לפי שם — נשמר בין שימושים כדי לא לסרוק שוב את כל העובדים
+let fuelPhoneCache = {};
+try { fuelPhoneCache = JSON.parse(localStorage.getItem('mtz_fuel_phone_cache') || '{}'); } catch(_) { fuelPhoneCache = {}; }
+function setFuelPhoneCache(name, phone) {
+  if (!name) return;
+  fuelPhoneCache[name] = phone || '';
+  try { localStorage.setItem('mtz_fuel_phone_cache', JSON.stringify(fuelPhoneCache)); } catch(_) {}
+}
+// נייד משיוך קודם בגיליון הדלק עצמו (עמודה G), לפי התאמת שם בעמודה F
+function phoneFromFuelData(all, name) {
+  if (!all || !name) return '';
+  for (let i = 0; i < all.length; i++) {
+    const row = all[i]; if (!row) continue;
+    const n = row[FUEL_EMP_COL] != null ? String(row[FUEL_EMP_COL]).trim() : '';
+    if (n !== name) continue;
+    const p = row[FUEL_PHONE_COL] != null ? String(row[FUEL_PHONE_COL]).trim() : '';
+    if (p) return p;
+  }
+  return '';
+}
+
+// חיפוש נייד: קודם מהמטמון (שיוך קודם); רק לשם חדש — מ-Master_Employees_Data
+async function lookupEmployeePhone(name) {
+  if (!name) return '';
+  if (Object.prototype.hasOwnProperty.call(fuelPhoneCache, name)) return fuelPhoneCache[name];
+  const map = await ensureEmployeesPhoneMap();
+  const phone = (map && map[name] != null) ? map[name] : '';
+  setFuelPhoneCache(name, phone);
+  return phone;
+}
+
+// פורמט מספר רכב ###-##-###
+function formatPlate(val) {
+  const d = String(val == null ? '' : val).replace(/\D/g, '').slice(0, 8);
+  const p = [];
+  if (d.length > 0) p.push(d.slice(0, 3));
+  if (d.length > 3) p.push(d.slice(3, 5));
+  if (d.length > 5) p.push(d.slice(5, 8));
+  return p.join('-');
+}
+function attachPlateFormat(input) {
+  input.addEventListener('input', () => { input.value = formatPlate(input.value); });
+}
+
+// פורמט נייד לשמירה/הצגה: ###-####-### (עם השלמת 0 מוביל)
+function formatPhoneIL(val) {
+  let d = String(val == null ? '' : val).replace(/\D/g, '');
+  if (!d) return '';
+  if (d.startsWith('972')) d = '0' + d.slice(3);
+  else if (d.length === 9 && d[0] === '5') d = '0' + d;
+  d = d.slice(0, 10);
+  const p = [];
+  if (d.length > 0) p.push(d.slice(0, 3));
+  if (d.length > 3) p.push(d.slice(3, 7));
+  if (d.length > 7) p.push(d.slice(7, 10));
+  return p.join('-');
+}
+
+// פרטים נוספים עם טופס שיוך (לכרטיס שעדיין לא שויך)
+function buildFuelAssignDetails(card, r, headers, sheetRow, key, fuelNames, all) {
+  const details = document.createElement('div'); details.className = 'emp-details';
+  const form = document.createElement('div'); form.className = 'fuel-edit';
+  const ftitle = document.createElement('div'); ftitle.className = 'fuel-edit-title'; ftitle.textContent = 'שיוך תלוש לעובד';
+  form.appendChild(ftitle);
+
+  // 1. שיוך לשם — בחירה מהקיימים (עמודה F) או הקלדת שם חדש
+  const nameWrap = document.createElement('div'); nameWrap.className = 'fuel-edit-field';
+  const nameLab = document.createElement('label'); nameLab.textContent = 'שיוך לשם';
+  const inName = document.createElement('input'); inName.className = 'fuel-input'; inName.type = 'text';
+  inName.setAttribute('list', 'fuel-names-' + sheetRow);
+  inName.placeholder = 'בחר מהרשימה או הקלד שם חדש';
+  const dl = document.createElement('datalist'); dl.id = 'fuel-names-' + sheetRow;
+  fuelNames.forEach(n => { const o = document.createElement('option'); o.value = n; dl.appendChild(o); });
+  nameWrap.append(nameLab, inName, dl); form.appendChild(nameWrap);
+
+  // 2. תאריך מסירת התלוש (עמודה H) — יומן, ברירת מחדל היום
+  const dateWrap = document.createElement('div'); dateWrap.className = 'fuel-edit-field';
+  const dateLab = document.createElement('label'); dateLab.textContent = 'תאריך מסירת התלוש';
+  const inDate = document.createElement('input'); inDate.className = 'fuel-input'; inDate.type = 'date';
+  inDate.value = toInputDate(r[FUEL_DELIVERY_COL]) || todayISO();
+  dateWrap.append(dateLab, inDate); form.appendChild(dateWrap);
+
+  // מספר רכב (לא חובה) — מושלם מהשיוך הקודם של אותו עובד; פורמט ###-##-###
+  const vehWrap = document.createElement('div'); vehWrap.className = 'fuel-edit-field';
+  const vehLab = document.createElement('label'); vehLab.textContent = 'מספר רכב (לא חובה)';
+  const inVeh = document.createElement('input'); inVeh.className = 'fuel-input'; inVeh.type = 'text'; inVeh.inputMode = 'numeric'; inVeh.placeholder = '159-79-204';
+  inVeh.value = formatPlate(r[FUEL_VEHICLE_COL]);
+  vehWrap.append(vehLab, inVeh); form.appendChild(vehWrap);
+  let vehManual = inVeh.value !== '';
+  attachPlateFormat(inVeh);
+  inVeh.addEventListener('input', () => { vehManual = true; });
+
+  // 3. נייד העובד (השלמה אוטומטית) + כפתור וואטסאפ
+  const phoneWrap = document.createElement('div'); phoneWrap.className = 'fuel-edit-field';
+  const phoneLab = document.createElement('label'); phoneLab.textContent = 'נייד העובד';
+  const phoneRow = document.createElement('div'); phoneRow.className = 'fuel-phone-row';
+  const inPhone = document.createElement('input'); inPhone.className = 'fuel-input'; inPhone.type = 'text'; inPhone.inputMode = 'tel'; inPhone.placeholder = '050...';
+  const waBtn = document.createElement('button'); waBtn.className = 'wa-btn'; waBtn.title = 'שליחת קוד התלוש בוואטסאפ'; waBtn.innerHTML = WA_SVG;
+  phoneRow.append(inPhone, waBtn);
+  phoneWrap.append(phoneLab, phoneRow); form.appendChild(phoneWrap);
+
+  // השלמה אוטומטית לפי שם (עד שמשנים ידנית): נייד + מספר רכב קודם
+  let phoneManual = false;
+  async function fillFromName() {
+    const name = inName.value.trim();
+    if (!name) return;
+    if (!vehManual) { const v = lastVehicleForEmployee(all, name); if (v) inVeh.value = formatPlate(v); }
+    if (!phoneManual) {
+      let phone = phoneFromFuelData(all, name);        // משיוך קודם בגיליון הדלק (עמודה G)
+      if (!phone) phone = await lookupEmployeePhone(name); // שם חדש -> מרשימת העובדים (AP)
+      if (phone && !phoneManual) inPhone.value = formatPhoneIL(phone);
+    }
+  }
+  inName.addEventListener('input', fillFromName);
+  inName.addEventListener('change', fillFromName);
+  inPhone.addEventListener('input', () => { phoneManual = true; });
+
+  // וואטסאפ — שלום [שם] קוד תלוש הדלק החדש הינו : [עמודה B]
+  waBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const name = inName.value.trim();
+    const phone = normalizePhoneIL(inPhone.value);
+    if (!phone) { alert('אין מספר נייד לעובד'); return; }
+    const code = r[FUEL_CODE_COL] != null ? String(r[FUEL_CODE_COL]).trim() : '';
+    const msg = `שלום ${name} קוד תלוש הדלק החדש הינו : ${code}`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    const w = window.open(url, '_blank'); if (!w) location.href = url;
+  });
+
+  // שמירה — כותב שם (F), תאריך מסירה (H), ומספר רכב (K) אם הוזן
+  const saveBtn = document.createElement('button'); saveBtn.className = 'fuel-save'; saveBtn.textContent = 'שמור ושייך';
+  const msg = document.createElement('div'); msg.className = 'fuel-save-msg';
+  saveBtn.addEventListener('click', () => {
+    const name = inName.value.trim();
+    if (!name) { msg.style.color = '#c0392b'; msg.textContent = 'יש לבחור או להזין שם עובד'; return; }
+    const dateStr = isoToSheetDate(inDate.value);
+    const veh = inVeh.value.trim();
+    const updL = { F: name, H: dateStr };
+    const updI = { [FUEL_EMP_COL]: name, [FUEL_DELIVERY_COL]: dateStr };
+    if (veh) { updL.K = veh; updI[FUEL_VEHICLE_COL] = veh; }
+    // נייד נשמר לעמודה G בגיליון בפורמט ###-####-### (זמין מכל מכשיר) וגם למטמון המהיר
+    const phoneVal = formatPhoneIL(inPhone.value);
+    if (phoneVal) { inPhone.value = phoneVal; updL.G = phoneVal; updI[FUEL_PHONE_COL] = phoneVal; setFuelPhoneCache(name, phoneVal); }
+    saveFuelRow(sheetRow, key, updL, updI, saveBtn, msg);
+  });
+  form.appendChild(saveBtn);
+  form.appendChild(msg);
+  details.appendChild(form);
+
+  // שאר העמודות (קריאה בלבד) — מדלגים על מספר הכרטיס, היתרה, ושדות הנערכים
+  const skip = new Set([FUEL_CARD_COL, FUEL_BALANCE_COL, FUEL_EMP_COL, FUEL_DELIVERY_COL, FUEL_VEHICLE_COL]);
+  const rb = document.createElement('div'); rb.className = 'rec-body';
+  const maxCols = Math.max(headers.length, r.length);
+  for (let i = 0; i < maxCols; i++) {
+    if (skip.has(i)) continue;
+    const val = r[i] != null ? String(r[i]).trim() : '';
+    if (!val) continue;
+    const lbl = (headers[i] && headers[i].trim()) ? headers[i] : ('עמודה ' + (i + 1));
+    const f = document.createElement('div'); f.className = 'rec-field';
+    const ls = document.createElement('span'); ls.className = 'rec-lbl'; ls.textContent = lbl;
+    const vs = document.createElement('span'); vs.className = 'rec-val'; vs.textContent = val;
+    f.append(ls, vs); rb.appendChild(f);
+  }
+  details.appendChild(rb);
+
+  const btn = document.createElement('button'); btn.className = 'emp-expand';
+  const txt = document.createElement('span'); txt.textContent = 'פרטים נוספים / שיוך';
+  const arr = document.createElement('span'); arr.className = 'emp-arrow'; arr.textContent = '▾';
+  btn.append(txt, arr);
+  btn.addEventListener('click', () => {
+    const open = card.classList.toggle('open');
+    txt.textContent = open ? 'סגור' : 'פרטים נוספים / שיוך';
+  });
+  card.appendChild(btn);
+  card.appendChild(details);
 }
 
 // מספר הרכב האחרון של העובד — לפי התדלוק העדכני ביותר; אחרת השורה האחרונה
@@ -1108,7 +1320,8 @@ function buildFuelEditDetails(card, r, headers, sheetRow, key, all, empName) {
     return inp;
   };
 
-  const inVehicle = mkField('מספר רכב', 'text', vehicle, '159-79-204');
+  const inVehicle = mkField('מספר רכב', 'text', formatPlate(vehicle), '159-79-204');
+  attachPlateFormat(inVehicle);
   const inDate1 = mkField('תאריך תדלוק ראשון', 'date', date1);
   const inAmt1  = mkField('גובה תדלוק ראשון', 'number', amt1);
   const inDate2 = mkField('תאריך תדלוק שני', 'date', date2);
