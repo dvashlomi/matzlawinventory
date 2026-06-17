@@ -738,8 +738,8 @@ let moduleSearchQ = {};   // key -> query
 let currentModule = null;
 
 async function fetchTab(ssId, tab) {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${ssId}/values/${encodeURIComponent(tab)}?key=${API_KEY}`;
-  const r = await fetch(url);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${ssId}/values/${encodeURIComponent(tab)}?key=${API_KEY}&_=${Date.now()}`;
+  const r = await fetch(url, { cache: 'no-store' });
   if (!r.ok) {
     let msg = 'שגיאה ' + r.status;
     try { const e = await r.json(); if (e.error?.message) msg = e.error.message; } catch(_) {}
@@ -1008,14 +1008,12 @@ function isoToSheetDate(iso) { // פורמט כתיבה לגיליון: DD/MM/YY
   return m ? `${m[3]}/${m[2]}/${m[1].slice(2)}` : iso;
 }
 
-// התאריך העדכני ביותר של תלוש (מסירה H / תדלוק I / תדלוק J) כ-timestamp; -1 אם אין
-function voucherLatestTime(r) {
-  let t = -1;
-  [FUEL_DELIVERY_COL, FUEL_DATE1_COL, FUEL_DATE2_COL].forEach(c => {
-    const d = toInputDate(r[c]);
-    if (d) { const p = Date.parse(d); if (!isNaN(p) && p > t) t = p; }
-  });
-  return t;
+// תאריך המסירה (עמודה H) כ-timestamp למיון; -1 אם אין/לא ניתן לפענוח
+function deliveryTime(r) {
+  const d = toInputDate(r[FUEL_DELIVERY_COL]);
+  if (!d) return -1;
+  const p = Date.parse(d);
+  return isNaN(p) ? -1 : p;
 }
 
 function renderFuel(key) {
@@ -1038,9 +1036,9 @@ function renderFuel(key) {
   }
   const q = (moduleSearchQ[key] || '').trim().toLowerCase();
   if (q) {
-    // חיפוש: כל התלושים התואמים — כולל יתרה 0 — ממוינים מהקרוב להיום לישן
+    // חיפוש: כל התלושים התואמים — כולל יתרה 0 — ממוינים לפי תאריך מסירה (H), הישן למעלה והעדכני למטה
     items = items.filter(({ r }) => r.some(c => c != null && String(c).toLowerCase().includes(q)));
-    items.sort((a, b) => voucherLatestTime(b.r) - voucherLatestTime(a.r));
+    items.sort((a, b) => deliveryTime(a.r) - deliveryTime(b.r));
   } else if (cfg.hideZeroCol != null) {
     // תצוגה רגילה: מסתירים תלושים עם יתרה 0
     items = items.filter(({ r }) => {
@@ -1166,6 +1164,12 @@ function formatPlate(val) {
 }
 function attachPlateFormat(input) {
   input.addEventListener('input', () => { input.value = formatPlate(input.value); });
+}
+
+// חילוץ ערך מספרי בלבד (הקובץ עשוי להחזיר "150 ש\"ח" / "₪150" / "1,200")
+function numericValue(v) {
+  if (v == null) return '';
+  return String(v).replace(/[^\d.\-]/g, '');
 }
 
 // פורמט נייד לשמירה/הצגה: ###-####-### (עם השלמת 0 מוביל)
@@ -1332,13 +1336,11 @@ function buildFuelEditDetails(card, r, headers, sheetRow, key, all, empName) {
   // ערכים קיימים / ברירות מחדל
   const vehicle = (r[FUEL_VEHICLE_COL] != null ? String(r[FUEL_VEHICLE_COL]).trim() : '')
                   || lastVehicleForEmployee(all, empName);
-  const date1 = toInputDate(r[FUEL_DATE1_COL]) || todayISO();
-  const amt1Existing = r[FUEL_AMT1_COL] != null ? String(r[FUEL_AMT1_COL]).trim() : '';
-  const amt1 = amt1Existing || String(FUEL_DEFAULT_AMT);
-  const date2 = toInputDate(r[FUEL_DATE2_COL]) || todayISO();
-  const amt2Existing = r[FUEL_AMT2_COL] != null ? String(r[FUEL_AMT2_COL]).trim() : '';
-  const amt2AutoMode = amt2Existing === '';
-  const amt2 = amt2Existing || String(Math.max(FUEL_DEFAULT_AMT - (parseFloat(amt1) || 0), 0));
+  const date1 = toInputDate(r[FUEL_DATE1_COL]);   // ריק אם אין תאריך
+  const amt1 = numericValue(r[FUEL_AMT1_COL]) || String(FUEL_DEFAULT_AMT);
+  const date2 = toInputDate(r[FUEL_DATE2_COL]);   // ריק אם אין תאריך
+  const amt2Num = numericValue(r[FUEL_AMT2_COL]);
+  const amt2 = amt2Num || '0';
 
   const mkField = (labelTxt, type, val, placeholder) => {
     const wrap = document.createElement('div'); wrap.className = 'fuel-edit-field';
@@ -1357,16 +1359,43 @@ function buildFuelEditDetails(card, r, headers, sheetRow, key, all, empName) {
   const inDate2 = mkField('תאריך תדלוק שני', 'date', date2);
   const inAmt2  = mkField('גובה תדלוק שני', 'number', amt2);
 
-  // עדכון אוטומטי של תדלוק שני = 250 − ראשון, עד שהמשתמש משנה ידנית
-  let amt2Auto = amt2AutoMode;
+  // גובה תדלוק שני: נשאר 0 עד שמולא תאריך תדלוק שני; אז = יתרה (250 − ראשון). 0/ריק = טרם בוצע.
+  let amt2Manual = amt2Num !== '' && parseFloat(amt2Num) !== 0;
+  function recomputeAmt2() {
+    if (amt2Manual) return;
+    inAmt2.value = inDate2.value
+      ? String(Math.max(FUEL_DEFAULT_AMT - (parseFloat(inAmt1.value) || 0), 0))
+      : '0';
+  }
+  // לחיצה על שדה תאריך ריק → ממלא את תאריך היום (כל שדה בנפרד)
+  inDate1.addEventListener('focus', () => { if (!inDate1.value) inDate1.value = todayISO(); });
+  inDate2.addEventListener('focus', () => { if (!inDate2.value) { inDate2.value = todayISO(); recomputeAmt2(); } });
+  inDate2.addEventListener('change', recomputeAmt2);
+  // הגבלה: סך תדלוק ראשון + שני לא יעלה על 250
   inAmt1.addEventListener('input', () => {
-    if (amt2Auto) inAmt2.value = String(Math.max(FUEL_DEFAULT_AMT - (parseFloat(inAmt1.value) || 0), 0));
+    const n = parseFloat(inAmt1.value);
+    if (!isNaN(n)) { if (n > FUEL_DEFAULT_AMT) inAmt1.value = String(FUEL_DEFAULT_AMT); else if (n < 0) inAmt1.value = '0'; }
+    recomputeAmt2();
   });
-  inAmt2.addEventListener('input', () => { amt2Auto = false; });
+  inAmt2.addEventListener('input', () => {
+    amt2Manual = true;
+    const n = parseFloat(inAmt2.value);
+    if (!isNaN(n)) {
+      const maxA2 = Math.max(FUEL_DEFAULT_AMT - (parseFloat(inAmt1.value) || 0), 0);
+      if (n > maxA2) inAmt2.value = String(maxA2); else if (n < 0) inAmt2.value = '0';
+    }
+  });
 
   const saveBtn = document.createElement('button'); saveBtn.className = 'fuel-save'; saveBtn.textContent = 'שמור שינויים';
   const msg = document.createElement('div'); msg.className = 'fuel-save-msg';
   saveBtn.addEventListener('click', () => {
+    const a1 = parseFloat(inAmt1.value) || 0;
+    const a2 = parseFloat(inAmt2.value) || 0;
+    if (a1 + a2 > FUEL_DEFAULT_AMT) {
+      msg.style.color = '#c0392b';
+      msg.textContent = 'סך התדלוקים (' + (a1 + a2) + ' ש"ח) חורג מ-' + FUEL_DEFAULT_AMT + ' ש"ח';
+      return;
+    }
     saveFuelRow(sheetRow, key, {
       K: inVehicle.value,
       I: isoToSheetDate(inDate1.value),
@@ -1445,7 +1474,7 @@ async function saveFuelRow(sheetRow, key, updatesByLetter, updatesByIndex, btn, 
     msg.textContent = '✓ נשמר בהצלחה';
     // רענון מהקובץ לאחר הצגת האישור — היתרה (עמודה N) מחושבת בגיליון,
     // וכך תלוש שהגיע ל-0 ייעלם מהרשימה
-    setTimeout(() => { if (currentModule === key) loadModule(key, true); }, 1200);
+    setTimeout(() => { if (currentModule === key) loadModule(key, true); }, 1500);
   } catch(e) {
     msg.style.color = '#c0392b';
     msg.textContent = '⚠️ ' + e.message;
@@ -1606,27 +1635,28 @@ async function fetchSheet(name) {
   const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
   const range = SHEET_RANGES[name];
   if (range) {
-    const hUrl = base + encodeURIComponent(name) + `!A${range.headerRow}:AZ${range.headerRow}` + `?key=${API_KEY}`;
-    const dUrl = base + encodeURIComponent(name) + `!A${range.dataStart}:AZ${range.dataEnd}`   + `?key=${API_KEY}`;
-    const hRes = await fetch(hUrl);
+    const cb = `&_=${Date.now()}`;
+    const hUrl = base + encodeURIComponent(name) + `!A${range.headerRow}:AZ${range.headerRow}` + `?key=${API_KEY}` + cb;
+    const dUrl = base + encodeURIComponent(name) + `!A${range.dataStart}:AZ${range.dataEnd}`   + `?key=${API_KEY}` + cb;
+    const hRes = await fetch(hUrl, { cache: 'no-store' });
     if (!hRes.ok) { const e = await hRes.json(); throw new Error(e.error?.message || 'שגיאה'); }
     const hJson = await hRes.json();
-    const dRes = await fetch(dUrl);
+    const dRes = await fetch(dUrl, { cache: 'no-store' });
     if (!dRes.ok) { const e = await dRes.json(); throw new Error(e.error?.message || 'שגיאה'); }
     const dJson = await dRes.json();
     const headers = (hJson.values || [[]])[0];
     const data    = dJson.values || [];
     return [headers, ...data];
   } else {
-    const r = await fetch(base + encodeURIComponent(name) + `?key=${API_KEY}`);
+    const r = await fetch(base + encodeURIComponent(name) + `?key=${API_KEY}&_=${Date.now()}`, { cache: 'no-store' });
     if (!r.ok) { const e = await r.json(); throw new Error(e.error?.message || 'שגיאה'); }
     return (await r.json()).values || [];
   }
 }
 
 async function fetchAllSheetNames() {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=sheets.properties.title`;
-  const r = await fetch(url);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}&fields=sheets.properties.title&_=${Date.now()}`;
+  const r = await fetch(url, { cache: 'no-store' });
   if (!r.ok) { const e=await r.json(); throw new Error(e.error?.message||'שגיאה'); }
   return (await r.json()).sheets.map(s => s.properties.title);
 }
