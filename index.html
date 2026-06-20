@@ -2214,12 +2214,19 @@ function openAptModal(row) {
   const priceZero = parsePrice(v(COL.PRICE_ZERO));
   const priceList = parsePrice(v(COL.PRICE_LIST));
   const pricePresale = parsePrice(v(COL.PRICE_PRESALE));
+  const sqmW = parsePrice(v(COL.SQM_W)); // מ"ר משוכלל (עמודה S)
 
   let html = fields.filter(([,val])=>val && val.trim() && val !== ' מ"ר' && val !== ' · ').map(([k,val]) =>
     `<div class="drow"><span class="dk">${k}</span><span class="dv">${val}</span></div>`
   ).join('');
 
+  // דירה מכורה: מחיר למ"ר מכירה בפועל = מכירה בפועל (J) / מ"ר משוכלל (S)
+  if (isSold(row) && priceSale && sqmW)
+    html += `<div class="price-zero"><span class="pk">מחיר למ"ר מכירה בפועל</span><span class="pv">${fmtPrice(priceSale / sqmW)}</span></div>`;
   if (priceSale)    html += `<div class="price-box"><span class="pk">מכירה בפועל</span><span class="pv">${fmtPrice(priceSale)}</span></div>`;
+  // דירה למכירה: מחושב לפי מחיר למ"ר = דוח אפס (F) / מ"ר משוכלל (S)
+  if (isAvail(row) && priceZero && sqmW)
+    html += `<div class="price-zero"><span class="pk">מחיר דוח אפס מחושב לפי מחיר למ"ר</span><span class="pv">${fmtPrice(priceZero / sqmW)}</span></div>`;
   if (priceZero)    html += `<div class="price-zero"><span class="pk">מחיר דוח אפס</span><span class="pv">${fmtPrice(priceZero)}</span></div>`;
   if (priceList)    html += `<div class="price-zero"><span class="pk">מחיר מחירון</span><span class="pv">${fmtPrice(priceList)}</span></div>`;
   if (pricePresale) html += `<div class="price-zero"><span class="pk">מחיר PreSale</span><span class="pv">${fmtPrice(pricePresale)}</span></div>`;
