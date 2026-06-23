@@ -288,6 +288,39 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 .tag-land{background:var(--blue-st-bg);color:var(--blue-st);}
 .tag-land2{background:var(--blue-st-bg);color:var(--red);}
 .tag-avail{background:var(--bg);color:var(--blue-dark);border:0.5px solid var(--border);}
+
+/* PDF EXPORT */
+.pdf-btn{background:var(--gold);width:auto;padding:0 12px;gap:5px;font-size:13px;font-weight:700;white-space:nowrap;}
+.pdf-btn:active{background:var(--gold-light);}
+#pdf-print-area{display:none;}
+@media print{
+  @page{size:A4;margin:14mm 12mm;}
+  html,body{background:#fff !important;height:auto !important;overflow:visible !important;}
+  body > *{display:none !important;}
+  #pdf-print-area{display:block !important;direction:rtl;font-family:'Assistant',sans-serif;color:#1a2540;}
+  .pdf-head{border-bottom:2px solid #b8943a;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}
+  .pdf-h1{font-size:20px;font-weight:800;color:#1a3a6b;margin:0;}
+  .pdf-sub{font-size:12px;color:#5a6a85;margin:4px 0 0;}
+  .pdf-meta{font-size:11px;color:#5a6a85;text-align:left;white-space:nowrap;}
+  .pdf-sec-title{font-size:15px;font-weight:800;color:#1a3a6b;margin:20px 0 9px;padding-right:8px;border-right:4px solid #b8943a;}
+  table.pdf-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+  table.pdf-tbl th{background:#1a3a6b;color:#fff;padding:6px 5px;text-align:right;font-weight:700;}
+  table.pdf-tbl td{border:0.5px solid #d8e2f0;padding:5px;text-align:right;}
+  table.pdf-tbl tr{page-break-inside:avoid;}
+  table.pdf-tbl td.num{font-weight:700;color:#1a3a6b;white-space:nowrap;}
+  table.pdf-tbl tr.pdf-row-sold td{background:#EAF3DE;}
+  table.pdf-tbl tr.pdf-row-land td{background:#E6F1FB;}
+  .pdf-card{border:0.5px solid #d8e2f0;border-radius:8px;padding:10px 12px;margin-bottom:10px;page-break-inside:avoid;}
+  .pdf-card.pdf-card-req{background:#FDF6D0;border-color:#ecd98a;}
+  .pdf-card-head{font-size:13px;font-weight:800;color:#1a3a6b;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .pdf-badge{font-size:10px;font-weight:700;background:#eef3fb;color:#1a3a6b;border-radius:6px;padding:2px 8px;white-space:nowrap;}
+  .pdf-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;font-size:11px;}
+  .pdf-kv{display:flex;justify-content:space-between;border-bottom:0.5px dotted #e0e8f4;padding:2px 0;}
+  .pdf-kv .k{color:#5a6a85;}
+  .pdf-kv .v{font-weight:600;color:#1a2540;}
+  .pdf-zero{margin-top:8px;background:#eef3fb;border-radius:6px;padding:7px 10px;display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;color:#1a3a6b;}
+  .pdf-foot{margin-top:18px;border-top:0.5px solid #d8e2f0;padding-top:6px;font-size:9px;color:#9aabb0;text-align:center;}
+}
 </style>
 </head>
 <body>
@@ -417,6 +450,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
       <div class="tb-title">תוצאות חיפוש</div>
       <div class="tb-sub" id="search-sub"></div>
     </div>
+    <button class="tb-btn pdf-btn" id="pdf-export-btn" onclick="exportSearchPDF()" title="ייצוא ל-PDF" style="display:none;">📄 PDF</button>
   </div>
   <div class="sbody" id="search-body"></div>
 </div>
@@ -2270,6 +2304,10 @@ function runSearch(q) {
 }
 
 function renderSearch(results, q, showRevenue) {
+  lastSearchResults = results || [];
+  lastSearchQuery = q || '';
+  const pdfBtn = document.getElementById('pdf-export-btn');
+  if (pdfBtn) pdfBtn.style.display = (results && results.length) ? 'flex' : 'none';
   const sub = document.getElementById('search-sub');
   sub.textContent = results.length + ' תוצאות עבור "' + q + '"';
   const body = document.getElementById('search-body');
@@ -2364,6 +2402,147 @@ function renderSearch(results, q, showRevenue) {
     body.appendChild(card);
   });
   showScreen('s-search');
+}
+
+// ═══════════════════════════════════════
+// PDF EXPORT — ייצוא תוצאות החיפוש ל-PDF
+// ═══════════════════════════════════════
+let lastSearchResults = [];
+let lastSearchQuery = '';
+
+function pdfEsc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+function pdfMoney(n) {
+  if (!n) return '—';
+  return '₪' + Math.round(n).toLocaleString('he-IL');
+}
+
+function exportSearchPDF() {
+  const results = lastSearchResults || [];
+  if (!results.length) { alert('אין תוצאות לייצוא'); return; }
+
+  // קבוצת "מכור": חתום + בעלי קרקע + בעלי קרקע שלב ב'
+  const soldGroup = results.filter(r => isSold(r) || isLand(r) || isLand2(r));
+  // מיון: קודם חתום (ירוק), אחר כך בעלי קרקע (כחול)
+  const ordKey = r => isSold(r) ? 0 : 1;
+  soldGroup.sort((a,b) => ordKey(a) - ordKey(b));
+  // קבוצת "לא נמכר": כל השאר (כולל בקשת רכישה)
+  const unsold = results.filter(r => !(isSold(r) || isLand(r) || isLand2(r)));
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('he-IL') + ' ' +
+    now.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
+
+  // ── כותרת ──
+  let html = '<div class="pdf-head">' +
+    '<div>' +
+      '<div class="pdf-h1">מצלאוי חברה לבניין בע"מ</div>' +
+      '<div class="pdf-sub">דוח מלאי דירות · ' + pdfEsc(lastSearchQuery) + '</div>' +
+    '</div>' +
+    '<div class="pdf-meta">הופק: ' + pdfEsc(dateStr) + '<br>סה"כ ' + results.length +
+      ' נכסים · ' + soldGroup.length + ' מכורות/קרקע · ' + unsold.length + ' לא נמכרו</div>' +
+  '</div>';
+
+  // ── דירות מכורות / בעלי קרקע — טבלה ──
+  if (soldGroup.length) {
+    html += '<div class="pdf-sec-title">דירות מכורות ובעלי קרקע (' + soldGroup.length + ')</div>';
+    html += '<table class="pdf-tbl"><thead><tr>' +
+      '<th>פרויקט</th><th>בניין</th><th>דירה</th><th>קומה</th><th>חדרים</th>' +
+      '<th>שטח</th><th>סטטוס</th><th>שם הרוכש / בעל קרקע</th><th>מחיר</th><th>תאריך</th>' +
+    '</tr></thead><tbody>';
+    soldGroup.forEach(r => {
+      const v = k => getVal(r, k);
+      const area = v(COL.AREA) ? v(COL.AREA) + ' מ"ר' : '—';
+      const buyer = v(COL.BUYERS) || '—';
+      const price = parsePrice(v(COL.PRICE_SALE));
+      const date  = v(COL.DATE_SIGN) || v(COL.DATE_SIGN_EXP) || '—';
+      const rowCls = isSold(r) ? 'pdf-row-sold' : 'pdf-row-land';
+      html += '<tr class="' + rowCls + '">' +
+        '<td>' + pdfEsc(DISPLAY_NAMES[r._sheet] || r._sheet) + '</td>' +
+        '<td>' + pdfEsc(v(COL.BUILDING) || '—') + '</td>' +
+        '<td>' + pdfEsc(v(COL.APT) || '—') + '</td>' +
+        '<td>' + pdfEsc(v(COL.FLOOR) || '—') + '</td>' +
+        '<td>' + pdfEsc(v(COL.ROOMS) || '—') + '</td>' +
+        '<td>' + pdfEsc(area) + '</td>' +
+        '<td>' + pdfEsc(getStatus(r) || '—') + '</td>' +
+        '<td>' + pdfEsc(buyer) + '</td>' +
+        '<td class="num">' + pdfEsc(pdfMoney(price)) + '</td>' +
+        '<td>' + pdfEsc(date) + '</td>' +
+      '</tr>';
+    });
+    html += '</tbody></table>';
+  }
+
+  // ── דירות שלא נמכרו — כרטיסים מפורטים ──
+  if (unsold.length) {
+    html += '<div class="pdf-sec-title">דירות שלא נמכרו (' + unsold.length + ')</div>';
+    unsold.forEach(r => {
+      const v = k => getVal(r, k);
+      const head = 'דירה ' + (v(COL.APT) || '') +
+        (v(COL.BUILDING) ? ' · ' + v(COL.BUILDING) : '') +
+        (v(COL.FLOOR) ? ' · קומה ' + v(COL.FLOOR) : '');
+      const proj = DISPLAY_NAMES[r._sheet] || r._sheet;
+
+      const fields = [
+        ['פרויקט',      proj],
+        ['סוג נכס',     v(COL.APT_TYPE)],
+        ['דגם',         v(COL.MODEL)],
+        ['חדרים',       v(COL.ROOMS)],
+        ['חדרי אמבטיה', v(COL.BATH)],
+        ['שירותים',     v(COL.TOILET)],
+        ['שטח',         v(COL.AREA)         ? v(COL.AREA)+' מ"ר'         : ''],
+        ['מ"ר משוכלל',  v(COL.SQM_W)        ? v(COL.SQM_W)+' מ"ר'        : ''],
+        ['מרפסת כללי',  v(COL.BALCONY)      ? v(COL.BALCONY)+' מ"ר'      : ''],
+        ['מרפסת צידית', v(COL.BALCONY_SIDE) ? v(COL.BALCONY_SIDE)+' מ"ר' : ''],
+        ['מרפסת גג',    v(COL.BALCONY_ROOF) ? v(COL.BALCONY_ROOF)+' מ"ר' : ''],
+        ['שטח גינה',    v(COL.GARDEN)       ? v(COL.GARDEN)+' מ"ר'       : ''],
+        ['כיוונים',     v(COL.DIRS)],
+        ['חניה',        v(COL.PARKING)],
+        ['מחסן',        v(COL.STORAGE) + (v(COL.STORAGE_AREA) ? ' · '+v(COL.STORAGE_AREA)+' מ"ר' : '')],
+        ['ת. בקשת רכישה', v(COL.DATE_REQ)],
+        ['צפי חתימה',   v(COL.DATE_SIGN_EXP)],
+      ];
+
+      const rowsHtml = fields
+        .filter(([,val]) => val && String(val).trim() && val !== ' מ"ר' && val !== ' · ')
+        .map(([k,val]) => '<div class="pdf-kv"><span class="k">' + pdfEsc(k) +
+          '</span><span class="v">' + pdfEsc(val) + '</span></div>')
+        .join('');
+
+      const priceZero = parsePrice(v(COL.PRICE_ZERO));
+      const sqmW = parsePrice(v(COL.SQM_W));
+      let zeroHtml = '';
+      if (priceZero) {
+        zeroHtml += '<div class="pdf-zero"><span>מחיר דוח אפס</span><span>' +
+          pdfEsc(pdfMoney(priceZero)) + '</span></div>';
+        if (sqmW > 0)
+          zeroHtml += '<div class="pdf-zero"><span>מחיר דוח אפס למ"ר (לפי מ"ר משוכלל)</span><span>' +
+            pdfEsc(pdfMoney(priceZero / sqmW)) + '</span></div>';
+      }
+
+      html += '<div class="' + (isReq(r) ? 'pdf-card pdf-card-req' : 'pdf-card') + '">' +
+        '<div class="pdf-card-head"><span>' + pdfEsc(head) + '</span>' +
+          '<span class="pdf-badge">' + pdfEsc(getStatus(r) || '—') + '</span></div>' +
+        '<div class="pdf-card-grid">' + rowsHtml + '</div>' +
+        zeroHtml +
+      '</div>';
+    });
+  }
+
+  html += '<div class="pdf-foot">מצלאוי חברה לבניין בע"מ · דוח מלאי דירות · הופק ' +
+    pdfEsc(dateStr) + '</div>';
+
+  let area = document.getElementById('pdf-print-area');
+  if (!area) {
+    area = document.createElement('div');
+    area.id = 'pdf-print-area';
+    document.body.appendChild(area);
+  }
+  area.innerHTML = html;
+  window.print();
 }
 
 // ═══════════════════════════════════════
