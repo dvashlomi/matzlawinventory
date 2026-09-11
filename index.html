@@ -321,69 +321,390 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   .pdf-zero{margin-top:8px;background:#eef3fb;border-radius:6px;padding:7px 10px;display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;color:#1a3a6b;}
   .pdf-foot{margin-top:18px;border-top:0.5px solid #d8e2f0;padding-top:6px;font-size:9px;color:#9aabb0;text-align:center;}
 }
+
+/* ═══════════════════════════════════════════════════════
+   V2 — DESKTOP SHELL (login / sidebar / topbar / dashboard)
+   ═══════════════════════════════════════════════════════ */
+html,body{height:100%;}
+body{overflow-x:hidden;}
+
+/* ── LOGIN ── */
+.login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:500;
+  background:
+    linear-gradient(180deg,rgba(10,20,42,.55),rgba(10,20,42,.82)),
+    linear-gradient(120deg,#0d1c38,#1a3a6b 55%,#2f5c9e);
+  padding:20px;}
+.login-screen.hide{display:none;}
+.login-skyline{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:.5;}
+.login-card{position:relative;background:#fff;border-radius:20px;box-shadow:0 24px 60px rgba(5,12,30,.45);
+  width:100%;max-width:380px;padding:36px 32px 30px;text-align:center;}
+.login-badge{width:64px;height:64px;border-radius:16px;background:linear-gradient(145deg,var(--blue-dark),var(--blue-mid));
+  display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:var(--gold-light);font-size:28px;font-weight:800;
+  font-family:Georgia,serif;box-shadow:var(--shadow-lg);}
+.login-brand{font-size:22px;font-weight:700;color:var(--blue-dark);letter-spacing:.02em;}
+.login-brand b{color:var(--gold);}
+.login-sub{font-size:12.5px;color:var(--text-sub);margin-top:3px;margin-bottom:22px;}
+.login-welcome{font-size:14px;font-weight:600;color:var(--text-main);margin-bottom:16px;}
+.login-field{text-align:right;margin-bottom:12px;}
+.login-field label{display:block;font-size:12px;font-weight:600;color:var(--text-sub);margin-bottom:5px;}
+.login-field input{width:100%;border:1.5px solid var(--border);border-radius:11px;padding:11px 13px;
+  font-family:'Assistant',sans-serif;font-size:14px;color:var(--text-main);background:var(--bg);outline:none;}
+.login-field input:focus{border-color:var(--blue-mid);background:#fff;}
+.login-submit{width:100%;padding:13px;background:var(--blue-dark);color:#fff;border:none;border-radius:12px;
+  font-family:'Assistant',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;}
+.login-submit:active{opacity:.88;}
+.login-forgot{display:block;margin-top:14px;font-size:12.5px;color:var(--blue-mid);text-decoration:none;cursor:pointer;background:none;border:none;font-family:'Assistant',sans-serif;}
+.login-note{margin-top:18px;font-size:10.5px;color:var(--text-light);line-height:1.6;}
+
+/* ── APP SHELL ── */
+#app-wrap{display:none;}
+#app-wrap.show{display:block;}
+.sidebar{position:fixed;top:0;bottom:0;left:0;width:222px;background:var(--blue-dark);color:#fff;
+  display:flex;flex-direction:column;z-index:60;box-shadow:2px 0 18px rgba(10,20,42,.18);}
+.sb-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid rgba(255,255,255,.12);}
+.sb-logo-mark{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:var(--gold-light);font-family:Georgia,serif;font-size:16px;flex-shrink:0;}
+.sb-logo-text{font-size:15px;font-weight:700;color:#fff;line-height:1.2;}
+.sb-logo-text small{display:block;font-size:9.5px;font-weight:500;color:rgba(255,255,255,.5);margin-top:1px;}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 0;}
+.sb-sep{height:1px;background:rgba(255,255,255,.08);margin:8px 16px;}
+.sb-item{display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;color:rgba(255,255,255,.75);
+  padding:11px 18px;font-family:'Assistant',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-align:right;
+  border-right:3px solid transparent;}
+.sb-item .sb-ico{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.sb-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.sb-item.active{background:rgba(255,255,255,.1);color:#fff;border-right-color:var(--gold);}
+.sb-user{padding:13px 16px;border-top:0.5px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:9px;}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);color:#1a2540;font-size:12px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-user-info{flex:1;min-width:0;}
+.sb-user-name{font-size:12.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-user-role{font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-logout{background:none;border:none;color:rgba(255,255,255,.55);font-size:15px;cursor:pointer;flex-shrink:0;padding:4px;}
+.sb-logout:hover{color:#fff;}
+
+.main-col{margin-right:0;margin-left:222px;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);}
+.topbar{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;
+  padding:12px 24px;position:sticky;top:0;z-index:45;}
+.tb-menu-btn{display:none;background:var(--bg);border:none;border-radius:9px;width:36px;height:36px;font-size:16px;cursor:pointer;flex-shrink:0;}
+.tb-search-box{flex:1;max-width:460px;display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);
+  border-radius:11px;padding:9px 13px;}
+.tb-search-box input{flex:1;border:none;background:none;outline:none;font-family:'Assistant',sans-serif;font-size:14px;color:var(--text-main);}
+.tb-search-box .s-icon{color:var(--text-light);font-size:14px;}
+.tb-bell{background:var(--bg);border:none;border-radius:10px;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;position:relative;}
+.tb-avatar-block{display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;}
+.tb-av-circle{width:36px;height:36px;border-radius:50%;background:var(--blue-dark);color:var(--gold-light);font-weight:800;font-size:13px;
+  display:flex;align-items:center;justify-content:center;}
+.tb-av-text{text-align:right;line-height:1.25;}
+.tb-av-name{font-size:13px;font-weight:700;color:var(--text-main);}
+.tb-av-role{font-size:10.5px;color:var(--text-sub);}
+.content{flex:1;padding:22px 26px 40px;}
+.content .screen{display:none;min-height:0;}
+.content .screen.active{display:flex;}
+.content .sbody{padding:0;overflow:visible;}
+.content .tb{border-radius:14px;margin-bottom:16px;box-shadow:var(--shadow);position:static;}
+.content .search-wrap{border-radius:14px;margin-bottom:16px;}
+.content .legend-bar{border-radius:12px 12px 0 0;}
+.content .room-filter-bar{margin-bottom:2px;}
+
+/* ── PAGE HEADER (used by dashboard / reports) ── */
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+.page-title{font-size:21px;font-weight:700;color:var(--text-main);}
+.page-sub{font-size:13px;color:var(--text-sub);margin-top:2px;}
+.page-date{font-size:12.5px;color:var(--text-sub);background:var(--bg-card);border:0.5px solid var(--border);border-radius:10px;padding:7px 13px;}
+.page-actions{display:flex;gap:9px;flex-wrap:wrap;}
+.btn-outline{background:var(--bg-card);border:0.5px solid var(--border);border-radius:10px;padding:9px 15px;font-family:'Assistant',sans-serif;
+  font-size:13px;font-weight:700;color:var(--blue-dark);cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.btn-outline:hover{background:var(--bg);}
+.btn-outline.sm{padding:7px 12px;font-size:12.5px;}
+.btn-gold{background:var(--gold);border:none;color:#fff;}
+
+/* ── STAT CARDS (dashboard top row) ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+.stat-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:16px 16px 14px;}
+.stat-ico{width:38px;height:38px;border-radius:10px;background:var(--blue-st-bg);display:flex;align-items:center;justify-content:center;
+  font-size:18px;margin-bottom:10px;}
+.stat-val{font-size:26px;font-weight:700;color:var(--text-main);}
+.stat-lbl{font-size:12px;color:var(--text-sub);margin-top:2px;}
+
+/* ── DASHBOARD / REPORTS GRID ── */
+.dash-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:start;}
+.panel{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 18px 16px;}
+.panel-title{font-size:14px;font-weight:700;color:var(--text-main);margin-bottom:14px;}
+.mini-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mini-stat{background:var(--bg);border:0.5px solid var(--border);border-radius:11px;padding:12px;text-align:center;}
+.mini-val{font-size:20px;font-weight:700;}
+.mini-lbl{font-size:11px;color:var(--text-sub);margin-top:3px;}
+
+/* ── BAR CHART (css only) ── */
+.bar-chart{display:flex;align-items:flex-end;gap:14px;height:150px;padding-top:6px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;}
+.bar-track{width:100%;max-width:34px;height:100%;background:var(--bg);border-radius:6px;display:flex;align-items:flex-end;overflow:hidden;}
+.bar-fill{width:100%;background:linear-gradient(180deg,var(--gold-light),var(--gold));border-radius:6px 6px 0 0;min-height:3px;transition:height .4s ease;}
+.bar-val{font-size:12px;font-weight:700;color:var(--text-main);margin-top:6px;}
+.bar-lbl{font-size:10px;color:var(--text-sub);margin-top:1px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+
+/* ── DONUT (css conic-gradient) ── */
+.donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.donut{width:130px;height:130px;border-radius:50%;flex-shrink:0;position:relative;}
+.donut::after{content:"";position:absolute;inset:20px;background:var(--bg-card);border-radius:50%;}
+.donut-center{position:absolute;inset:20px;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.donut-center b{font-size:17px;color:var(--text-main);}
+.donut-center span{font-size:9.5px;color:var(--text-sub);}
+.donut-legend{flex:1;min-width:140px;display:flex;flex-direction:column;gap:8px;}
+.donut-leg-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-main);}
+.donut-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.donut-leg-item b{margin-right:auto;margin-left:0;}
+
+/* ── DATA TABLE (employees) ── */
+.data-table{width:100%;border-collapse:collapse;background:var(--bg-card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.data-table thead th{background:var(--blue-dark);color:#fff;font-size:12px;font-weight:700;text-align:right;padding:11px 14px;}
+.data-table tbody tr{border-bottom:0.5px solid var(--border);cursor:pointer;}
+.data-table tbody tr:last-child{border-bottom:none;}
+.data-table tbody tr:hover{background:#f8f9fc;}
+.data-table td{padding:11px 14px;font-size:13.5px;color:var(--text-main);vertical-align:middle;}
+.emp-name-cell{font-weight:700;}
+.status-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--text-light);}
+.status-dot.active{background:var(--green);}
+.emp-detail-row td{background:#f8f9fc;padding:0;}
+.emp-detail-row .rec-body{padding:12px 20px;}
+.table-wa-btn{width:32px;height:32px;}
+.table-wa-btn svg{width:16px;height:16px;}
+.emp-search-wrap{margin-bottom:12px;max-width:340px;}
+
+/* ── PROJECT CARD PHOTO BANNER ── */
+.pc-photo{height:86px;position:relative;overflow:hidden;}
+.pc-photo svg{width:100%;height:100%;display:block;}
+.proj-card{overflow:hidden;}
+#home-body{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;align-content:start;}
+#home-body .proj-card{margin-bottom:0;}
+@media(max-width:640px){#home-body{grid-template-columns:1fr;}}
+
+/* ── BUILDING ROW (table-like) ── */
+.bld-card{display:flex;align-items:stretch;}
+.bld-head{flex:0 0 200px;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;}
+.bld-stats{flex:1;grid-template-columns:repeat(6,1fr);}
+
+/* ── APT MODAL → CENTERED DIALOG ON DESKTOP ── */
+@media(min-width:860px){
+  .modal-overlay{align-items:center;justify-content:center;}
+  .modal-sheet{max-width:420px;border-radius:20px;max-height:86vh;animation:none;}
+}
+.modal-actions{display:flex;gap:8px;padding:0 20px 4px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);transition:transform .22s ease;}
+  .sidebar.open{transform:translateX(0);}
+  .main-col{margin-left:0;}
+  .tb-menu-btn{display:flex;align-items:center;justify-content:center;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .dash-grid{grid-template-columns:1fr;}
+  .bld-card{flex-direction:column;}
+  .bld-head{flex:none;}
+  .bld-stats{grid-template-columns:repeat(3,1fr);}
+  .content{padding:16px 14px 30px;}
+  .tb-av-text{display:none;}
+}
 </style>
 </head>
 <body>
 
-<!-- ═══ SETUP ═══ -->
-<div id="s-setup" class="screen active">
-  <div class="setup-wrap">
-    <div style="width:80px;height:80px;background:var(--blue-dark);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
-      <span style="font-size:36px;">🏗️</span>
-    </div>
-    <div class="setup-title">מצלאוי</div>
-    <div class="setup-sub">יזמות והתחדשות בבנייה<br>הזן את מפתח ה-API לחיבור לנתונים</div>
-    <div class="setup-field">
-      <div class="setup-label">Google Sheets API Key</div>
-      <input class="setup-input" id="inp-key" type="password" placeholder="AIzaSy..." autocomplete="off">
-    </div>
-    <div class="setup-field">
-      <div class="setup-label">כתובת Apps Script לשמירה (לעריכת תלושי דלק)</div>
-      <input class="setup-input" id="inp-write-url" type="text" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" style="direction:ltr;">
-    </div>
-    <button class="setup-btn" id="btn-connect">התחבר</button>
-    <div class="setup-err" id="setup-err"></div>
-    <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:20px;line-height:1.8;">
-      Google Cloud Console → Sheets API → Credentials → Create API Key<br>
-      יש לאפשר גישה לגיליון לכל מי שיש קישור (צופה)
-    </div>
+<!-- ═══ LOGIN ═══ -->
+<div id="s-login" class="login-screen">
+  <div class="login-skyline">
+    <svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMax slice" style="width:100%;height:100%;" xmlns="http://www.w3.org/2000/svg">
+      <g fill="rgba(255,255,255,.10)">
+        <rect x="40" y="150" width="70" height="250"/><rect x="130" y="90" width="60" height="310"/>
+        <rect x="210" y="200" width="50" height="200"/><rect x="900" y="120" width="65" height="280"/>
+        <rect x="985" y="60" width="55" height="340"/><rect x="1060" y="180" width="60" height="220"/>
+        <rect x="1140" y="100" width="45" height="300"/>
+      </g>
+    </svg>
+  </div>
+  <div class="login-card">
+    <div class="login-badge">M</div>
+    <div class="login-brand">MATZLAWI <b>מצלאוי</b></div>
+    <div class="login-sub">יזמות והתחדשות בבנייה · מרכז ניהול נכסים</div>
+    <div class="login-welcome">ברוכים הבאים למערכת ניהול מצלאוי</div>
+    <form id="login-form">
+      <div class="login-field">
+        <label>שם משתמש</label>
+        <input id="login-user" type="text" autocomplete="username" placeholder="שם מלא">
+      </div>
+      <div class="login-field">
+        <label>סיסמה</label>
+        <input id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button type="submit" class="login-submit">התחבר</button>
+    </form>
+    <button type="button" class="login-forgot" onclick="alert('פנה למנהל המערכת לאיפוס סיסמה.')">שכחתי סיסמה</button>
+    <div class="login-note">התחברות מיועדת כרגע למשתמש יחיד. תמיכה במספר משתמשים והרשאות תתווסף בשלב הבא.</div>
   </div>
 </div>
 
-<!-- ═══ LANDING MENU ═══ -->
-<div id="s-landing" class="screen">
-  <div class="tb">
-    <div style="flex:1">
-      <div class="tb-title">מצלאוי</div>
-      <div class="tb-sub">יזמות והתחדשות בבנייה</div>
+<!-- ═══ APP SHELL ═══ -->
+<div id="app-wrap">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">M</div>
+      <div class="sb-logo-text">MATZLAWI<small>מרכז ניהול נכסים</small></div>
     </div>
-    <button class="tb-btn" onclick="showScreen('s-setup')" title="הגדרות">⚙️</button>
+    <nav class="sb-nav">
+      <button class="sb-item" data-dest="dashboard" onclick="closeSidebarMobile();showScreen('s-landing');renderDashboard();"><span class="sb-ico">🏠</span>דשבורד</button>
+      <div class="sb-sep"></div>
+      <button class="sb-item" data-dest="inventory" onclick="closeSidebarMobile();goHome();"><span class="sb-ico">🏢</span>מלאי למכירה</button>
+      <button class="sb-item" data-dest="employees" onclick="closeSidebarMobile();openModule('employees');"><span class="sb-ico">👷</span>עובדים</button>
+      <button class="sb-item" data-dest="fuel" onclick="closeSidebarMobile();openModule('fuel');"><span class="sb-ico">⛽</span>דלק</button>
+      <button class="sb-item" data-dest="rentals" onclick="closeSidebarMobile();openModule('rentals');"><span class="sb-ico">🔑</span>שכירויות</button>
+      <div class="sb-sep"></div>
+      <button class="sb-item" data-dest="reports" onclick="closeSidebarMobile();showScreen('s-reports');renderReports();"><span class="sb-ico">📊</span>דוחות</button>
+      <button class="sb-item" data-dest="settings" onclick="closeSidebarMobile();showScreen('s-setup');"><span class="sb-ico">⚙️</span>הגדרות</button>
+    </nav>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar-initials">שד</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name" id="sb-user-name">שלומי דבש</div>
+        <div class="sb-user-role">סמנכ"ל שיווק ומכירות</div>
+      </div>
+      <button class="sb-logout" title="התנתקות" onclick="logoutApp()">⏻</button>
+    </div>
+  </aside>
+
+  <div class="main-col">
+    <header class="topbar">
+      <div class="tb-avatar-block" onclick="showScreen('s-setup')" title="הגדרות">
+        <div class="tb-av-circle" id="tb-avatar-initials">שד</div>
+        <div class="tb-av-text">
+          <div class="tb-av-name" id="tb-user-name">שלומי דבש</div>
+          <div class="tb-av-role">סמנכ"ל שיווק ומכירות</div>
+        </div>
+      </div>
+      <button class="tb-bell" title="התראות" onclick="alert('אין התראות חדשות')">🔔</button>
+      <button class="btn-outline sm" onclick="openAvailModal()" title="בדיקת חניה / מחסן">🅿️ בדיקת חניה/מחסן</button>
+      <div class="tb-search-box">
+        <span class="s-icon">🔍</span>
+        <input id="g-search" type="text" placeholder="חיפוש כללי — רוכש, דירה, פרויקט..." oninput="onSearch(this.value)">
+        <button class="s-clear" onclick="clearSearchBox(this)" title="נקה" style="display:none">✕</button>
+      </div>
+      <button class="tb-menu-btn" onclick="toggleSidebarMobile()" title="תפריט">☰</button>
+    </header>
+
+    <main class="content" id="content-area">
+
+<!-- ═══ SETUP ═══ -->
+<div id="s-setup" class="screen">
+  <div class="page-head">
+    <div>
+      <div class="page-title">הגדרות</div>
+      <div class="page-sub">חיבור נתונים, חברה ומשתמשים</div>
+    </div>
   </div>
-  <div class="menu-hero">
-    <div class="menu-logo">🏗️</div>
-    <div class="menu-hero-title">ברוכים הבאים</div>
-    <div class="menu-hero-sub">בחר מערכת לניהול</div>
+  <div class="sbody" style="display:flex;flex-direction:column;gap:16px;max-width:640px;">
+
+    <div class="panel">
+      <div class="panel-title">פרטי חברה</div>
+      <div class="drow"><span class="dk">שם חברה</span><span class="dv">מצלאוי חברה לבניין בע"מ</span></div>
+      <div class="drow"><span class="dk">תחומי עיסוק</span><span class="dv">התחדשות עירונית · מגורים · משרדים · מסחרי</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">חיבור נתונים (Google Sheets)</div>
+      <div class="setup-field">
+        <div class="setup-label">Google Sheets API Key</div>
+        <input class="setup-input" id="inp-key" type="password" placeholder="AIzaSy..." autocomplete="off">
+      </div>
+      <div class="setup-field">
+        <div class="setup-label">כתובת Apps Script לשמירה (לעריכת תלושי דלק)</div>
+        <input class="setup-input" id="inp-write-url" type="text" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" style="direction:ltr;">
+      </div>
+      <button class="setup-btn" id="btn-connect">התחבר</button>
+      <div class="setup-err" id="setup-err"></div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:14px;line-height:1.8;">
+        Google Cloud Console → Sheets API → Credentials → Create API Key<br>
+        יש לאפשר גישה לגיליון לכל מי שיש קישור (צופה)
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">סריקת פרויקטים חדשים</div>
+      <div class="drow"><span class="dk">חיפוש לשוניות חדשות בגיליון</span>
+        <button class="btn-outline sm" id="home-rescan">🔄 סרוק עכשיו</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">עדכון סטטוס דירות (חתום / חניה / מחסן)</div>
+      <div style="font-size:12.5px;color:var(--text-sub);line-height:1.7;margin-bottom:10px;">
+        כדי לאפשר עדכון סטטוס דירה, רוכשים, חניה ומחסן ישירות מכרטיס הדירה — יש לחבר Apps Script עם הרשאת כתיבה לגיליון המלאי.
+        אם כבר הוגדר Apps Script עבור תלושי הדלק בפורמט הכללי (מקבל spreadsheetId, tab, row, updates), ניתן להשתמש באותה כתובת.
+      </div>
+      <div class="setup-field">
+        <div class="setup-label">כתובת Apps Script לעדכון מלאי דירות</div>
+        <input class="setup-input" id="inp-inv-write-url" type="text" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" style="direction:ltr;">
+      </div>
+      <button class="btn-outline sm" onclick="toggleGasCode()">📄 הצג קוד Apps Script לפריסה</button>
+      <div id="gas-code-wrap" style="display:none;margin-top:12px;">
+        <pre id="gas-code" style="direction:ltr;text-align:left;background:#0f1c33;color:#d7e2f4;border-radius:10px;padding:14px;font-size:11.5px;line-height:1.6;overflow-x:auto;white-space:pre;">function doPost(e) {
+  try {
+    var body = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.openById(body.spreadsheetId);
+    var sheet = ss.getSheetByName(body.tab);
+    if (!sheet) throw new Error('Sheet not found: ' + body.tab);
+    var row = body.row;
+    var updates = body.updates || {};
+    Object.keys(updates).forEach(function (col) {
+      sheet.getRange(col + row).setValue(updates[col]);
+    });
+    return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</pre>
+        <div style="font-size:11.5px;color:var(--text-sub);line-height:1.8;margin-top:6px;">
+          פריסה: בגיליון המלאי → Extensions → Apps Script → הדבק את הקוד → Deploy → New deployment → Web app →
+          Execute as: Me, Who has access: Anyone with the link → Deploy, ואז הדבק את הכתובת שמתקבלת בשדה למעלה.
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="opacity:.7;">
+      <div class="panel-title">משתמשים והרשאות</div>
+      <div style="font-size:13px;color:var(--text-sub);line-height:1.7;">
+        כרגע המערכת מוגדרת למשתמש יחיד. הוספת משתמשים נוספים עם הרשאות לפי תפקיד תתווסף בשלב הבא של הפרויקט.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">חשבון</div>
+      <div class="drow"><span class="dk">מחובר בתור</span><span class="dv" id="settings-username">שלומי דבש</span></div>
+      <button class="btn-outline sm" style="margin-top:10px;" onclick="logoutApp()">⏻ התנתקות</button>
+    </div>
+
   </div>
-  <div class="menu-grid">
-    <div class="menu-tile" onclick="showScreen('s-home')">
-      <div class="menu-ico">🏢</div>
-      <div class="menu-name">מלאי למכירה</div>
-      <div class="menu-desc">דירות, פרויקטים וסטטוס מכירה</div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="s-landing" class="screen active">
+  <div class="page-head">
+    <div>
+      <div class="page-title" id="dash-greeting">בוקר טוב</div>
+      <div class="page-sub">מרכז הניהול של מצלאוי</div>
     </div>
-    <div class="menu-tile t-emp" onclick="openModule('employees')">
-      <div class="menu-ico">👷</div>
-      <div class="menu-name">עובדים</div>
-      <div class="menu-desc">ניהול עובדים ונוכחות</div>
+    <div class="page-date" id="dash-date"></div>
+  </div>
+  <div class="stat-row" id="dash-stats"></div>
+  <div class="dash-grid">
+    <div class="panel">
+      <div class="panel-title">תמונת מצב</div>
+      <div class="mini-stat-grid" id="dash-mini"></div>
     </div>
-    <div class="menu-tile t-fuel" onclick="openModule('fuel')">
-      <div class="menu-ico">⛽</div>
-      <div class="menu-name">תלושי דלק</div>
-      <div class="menu-desc">הקצאה ומעקב תלושים</div>
-    </div>
-    <div class="menu-tile t-rent" onclick="openModule('rentals')">
-      <div class="menu-ico">🔑</div>
-      <div class="menu-name">שכירויות</div>
-      <div class="menu-desc">חוזים ותשלומי שכירות</div>
+    <div class="panel">
+      <div class="panel-title">עסקאות שנחתמו לפי פרויקט</div>
+      <div class="bar-chart" id="dash-chart"></div>
     </div>
   </div>
 </div>
@@ -391,8 +712,7 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 <!-- ═══ GENERIC MODULE (employees / fuel / rentals) ═══ -->
 <div id="s-module" class="screen">
   <div class="tb">
-    <button class="tb-btn" onclick="openNav()" title="תפריט ניווט">☰</button>
-    <div style="flex:1;margin-right:8px">
+    <div style="flex:1">
       <div class="tb-title" id="module-title"></div>
       <div class="tb-sub" id="module-sub"></div>
     </div>
@@ -415,25 +735,13 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
 <!-- ═══ HOME ═══ -->
 <div id="s-home" class="screen">
   <div class="tb">
-    <button class="tb-btn" onclick="openNav()" title="תפריט ניווט">☰</button>
-    <div style="flex:1;margin-right:8px">
+    <div style="flex:1">
       <div class="tb-title">מלאי למכירה</div>
-      <div class="tb-sub">יזמות והתחדשות בבנייה</div>
+      <div class="tb-sub">כל הפרויקטים והדירות</div>
     </div>
-    <button class="tb-btn" id="home-rescan" title="סרוק לשוניות חדשות">🔄</button>
-    <button class="tb-btn" onclick="showScreen('s-setup')" title="הגדרות">⚙️</button>
-  </div>
-  <div class="search-wrap">
-    <div class="search-row">
-      <div class="s-box">
-        <span class="s-icon">🔍</span>
-        <input id="g-search" type="text" placeholder="חיפוש רוכש, דירה, פרויקט..." oninput="onSearch(this.value)">
-        <button class="s-clear" onclick="clearSearchBox(this)" title="נקה">✕</button>
-      </div>
-      <button class="filter-pill" onclick="openFilter()">
-        סינון <span class="filter-count" id="filter-count" style="display:none">0</span>
-      </button>
-    </div>
+    <button class="filter-pill" onclick="openFilter()">
+      סינון <span class="filter-count" id="filter-count" style="display:none">0</span>
+    </button>
   </div>
   <div id="new-banners"></div>
   <div class="sbody" id="home-body">
@@ -491,6 +799,35 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
   <div class="bld-grid-wrap" id="bld-grid"></div>
 </div>
 
+<!-- ═══ REPORTS ═══ -->
+<div id="s-reports" class="screen">
+  <div class="page-head">
+    <div>
+      <div class="page-title">דוחות</div>
+      <div class="page-sub">סיכום ביצועים, מכירות והתפלגות מלאי</div>
+    </div>
+    <div class="page-actions">
+      <button class="btn-outline" onclick="exportReportsPDF()">🖨️ ייצוא ל-PDF</button>
+      <button class="btn-outline" onclick="shareReportsWhatsapp()">💬 שיתוף בוואטסאפ</button>
+    </div>
+  </div>
+  <div class="stat-row" id="rep-stats"></div>
+  <div class="dash-grid">
+    <div class="panel">
+      <div class="panel-title">התפלגות מלאי לפי סטטוס</div>
+      <div class="donut-wrap" id="rep-donut"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">עסקאות שנחתמו לפי פרויקט</div>
+      <div class="bar-chart" id="rep-chart"></div>
+    </div>
+  </div>
+</div>
+
+    </main>
+  </div>
+</div>
+
 <!-- ═══ APT DETAIL MODAL ═══ -->
 <div class="modal-overlay" id="apt-modal" onclick="closeModal(event)">
   <div class="modal-sheet">
@@ -502,7 +839,47 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
       </div>
       <div class="status-badge" id="m-status"></div>
     </div>
+    <div class="modal-actions">
+      <button class="btn-outline sm" onclick="toggleAptEdit()">✏️ עדכון פרטים</button>
+      <button class="btn-outline sm" onclick="printAptModal()">🖨️ הדפסה / PDF</button>
+      <button class="btn-outline sm" onclick="shareAptWhatsapp()">💬 שיתוף בוואטסאפ</button>
+    </div>
+    <div class="modal-edit" id="apt-edit-panel" style="display:none;padding:0 20px 14px;">
+      <div class="fuel-edit-field">
+        <label>סטטוס</label>
+        <select class="fuel-input" id="edit-status"></select>
+      </div>
+      <div class="fuel-edit-field"><label>רוכשים / בעלי קרקע</label><input class="fuel-input" id="edit-buyers"></div>
+      <div class="fuel-edit-field"><label>מס' חניה</label><input class="fuel-input" id="edit-parking"></div>
+      <div class="fuel-edit-field"><label>מס' מחסן</label><input class="fuel-input" id="edit-storage"></div>
+      <button class="fuel-save" id="edit-save-btn" onclick="saveAptEdit()">שמור שינויים</button>
+      <div class="fuel-save-msg" id="edit-save-msg"></div>
+    </div>
     <div class="modal-body" id="m-body"></div>
+  </div>
+</div>
+
+<!-- ═══ AVAILABILITY CHECK MODAL (חניה / מחסן) ═══ -->
+<div class="modal-overlay" id="avail-modal" onclick="closeAvailModal(event)">
+  <div class="modal-sheet" style="max-width:420px;">
+    <span class="modal-handle"></span>
+    <div class="modal-head">
+      <div>
+        <div class="modal-apt-n">בדיקת זמינות חניה / מחסן</div>
+        <div class="modal-proj">הזן מספר לבדיקה מול כל הפרויקטים</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:14px;margin-bottom:12px;font-size:13px;">
+        <label style="display:flex;align-items:center;gap:5px;"><input type="radio" name="avail-type" value="parking" checked> חניה</label>
+        <label style="display:flex;align-items:center;gap:5px;"><input type="radio" name="avail-type" value="storage"> מחסן</label>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <input class="finput" id="avail-input" placeholder="מספר חניה / מחסן..." style="margin-bottom:0;" onkeydown="if(event.key==='Enter')checkAvailability()">
+        <button class="btn-apply" style="flex:0 0 auto;padding:10px 18px;" onclick="checkAvailability()">בדוק</button>
+      </div>
+      <div id="avail-results"></div>
+    </div>
   </div>
 </div>
 
@@ -557,22 +934,6 @@ body{font-family:'Assistant',sans-serif;background:var(--bg);color:var(--text-ma
       <button class="btn-clear" onclick="clearFilters()">נקה הכל</button>
       <button class="btn-apply" onclick="applyFilters()">החל סינון</button>
     </div>
-  </div>
-</div>
-
-<!-- ═══ NAV DRAWER ═══ -->
-<div class="nav-overlay" id="nav-overlay" onclick="closeNavIfOutside(event)">
-  <div class="nav-drawer">
-    <div class="nav-head">
-      <span>ניווט</span>
-      <button class="nav-close" onclick="closeNav()" title="סגור">✕</button>
-    </div>
-    <button class="nav-item" data-dest="home" onclick="navTo('home')"><span class="nav-ico">🏠</span>תפריט ראשי</button>
-    <div class="nav-sep"></div>
-    <button class="nav-item" data-dest="inventory" onclick="navTo('inventory')"><span class="nav-ico">🏢</span>מלאי למכירה</button>
-    <button class="nav-item" data-dest="employees" onclick="navTo('employees')"><span class="nav-ico">👷</span>עובדים</button>
-    <button class="nav-item" data-dest="fuel" onclick="navTo('fuel')"><span class="nav-ico">⛽</span>תלושי דלק</button>
-    <button class="nav-item" data-dest="rentals" onclick="navTo('rentals')"><span class="nav-ico">🔑</span>שכירויות</button>
   </div>
 </div>
 
@@ -657,6 +1018,7 @@ const COL = {
 // STATE
 // ═══════════════════════════════════════
 let API_KEY = localStorage.getItem('mtz_key') || 'YOUR_API_KEY_HERE';
+let connectedOnce = false;
 let allData = {}; // sheetName -> [{...}]
 let activeProject = null;
 let activeBuilding = null;
@@ -667,6 +1029,357 @@ let activeProjects = JSON.parse(localStorage.getItem('mtz_active_projects') || '
 if (!activeProjects) activeProjects = [...RELEVANT_SHEETS];
 
 let filters = {projects:[], status:[], rooms:[], dirs:[], building:'', floor:'', year:'', buyer:'', quarters:[]};
+
+// ═══════════════════════════════════════
+// LOGIN / APP SHELL
+// ═══════════════════════════════════════
+function initials(name) {
+  const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+function greetingWord() {
+  const h = new Date().getHours();
+  if (h < 12) return 'בוקר טוב';
+  if (h < 18) return 'צהריים טובים';
+  return 'ערב טוב';
+}
+function applyUserName(name) {
+  const first = (name || '').trim().split(/\s+/)[0] || '';
+  document.getElementById('sb-user-name').textContent = name;
+  document.getElementById('tb-user-name').textContent = name;
+  document.getElementById('settings-username').textContent = name;
+  document.getElementById('sb-avatar-initials').textContent = initials(name);
+  document.getElementById('tb-avatar-initials').textContent = initials(name);
+  const g = document.getElementById('dash-greeting');
+  if (g) g.textContent = greetingWord() + (first ? ', ' + first : '');
+}
+function enterApp() {
+  document.getElementById('s-login').style.display = 'none';
+  document.getElementById('app-wrap').classList.add('show');
+  if (API_KEY && API_KEY !== 'YOUR_API_KEY_HERE') {
+    document.getElementById('inp-key').value = API_KEY;
+    document.getElementById('btn-connect').click();
+  } else {
+    showScreen('s-setup');
+  }
+}
+function logoutApp() {
+  localStorage.removeItem('mtz_logged_in');
+  document.getElementById('app-wrap').classList.remove('show');
+  document.getElementById('s-login').style.display = 'flex';
+  closeSidebarMobile();
+}
+function toggleSidebarMobile() { document.querySelector('.sidebar').classList.toggle('open'); }
+function closeSidebarMobile() { document.querySelector('.sidebar').classList.remove('open'); }
+
+document.getElementById('login-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = document.getElementById('login-user').value.trim() || 'שלומי דבש';
+  localStorage.setItem('mtz_logged_in', '1');
+  localStorage.setItem('mtz_user_name', name);
+  applyUserName(name);
+  enterApp();
+});
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function aggregateStats() {
+  let total = 0, avail = 0, req = 0, sold = 0, revenue = 0;
+  const perProject = [];
+  activeProjects.forEach(name => {
+    const rows = allData[name];
+    if (!rows) return;
+    const st = projectStats(rows);
+    total += st.total; avail += st.avail; req += st.req; sold += st.sold; revenue += st.revenue;
+    perProject.push({ name, dname: DISPLAY_NAMES[name] || name, sold: st.sold, total: st.total });
+  });
+  return { total, avail, req, sold, revenue, perProject };
+}
+
+function renderBarChart(elId, perProject) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!perProject.length) { el.innerHTML = '<div class="empty-text" style="padding:20px 0;">אין נתונים</div>'; return; }
+  const max = Math.max(1, ...perProject.map(p => p.sold));
+  el.innerHTML = perProject.map(p => `
+    <div class="bar-col">
+      <div class="bar-track"><div class="bar-fill" style="height:${Math.max(3, Math.round(p.sold / max * 100))}%"></div></div>
+      <div class="bar-val">${p.sold}</div>
+      <div class="bar-lbl">${p.dname}</div>
+    </div>`).join('');
+}
+
+async function lazyLoadCount(key, elId) {
+  const el = document.getElementById(elId);
+  try {
+    const cfg = MODULES[key];
+    if (!moduleCache[key]) moduleCache[key] = await fetchTab(cfg.spreadsheetId, cfg.tab);
+    const hr = cfg.headerRow || 1;
+    let rows = (moduleCache[key] || []).slice(hr).filter(r => r && r.some(c => c != null && String(c).trim() !== ''));
+    if (cfg.hideZeroCol != null) {
+      rows = rows.filter(r => {
+        const num = parseFloat(String(r[cfg.hideZeroCol] == null ? '' : r[cfg.hideZeroCol]).replace(/[^\d.\-]/g, ''));
+        return !(Number.isFinite(num) && num === 0);
+      });
+    }
+    if (el) el.querySelector('.stat-val').textContent = rows.length;
+  } catch (e) {
+    if (el) el.querySelector('.stat-val').textContent = '—';
+  }
+}
+
+function renderDashboard() {
+  const name = localStorage.getItem('mtz_user_name') || 'שלומי דבש';
+  applyUserName(name);
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('he-IL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const g = aggregateStats();
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-ico">🏢</div><div class="stat-val">${g.avail}</div><div class="stat-lbl">מלאי פנוי למכירה</div></div>
+    <div class="stat-card" id="stat-emp"><div class="stat-ico">👷</div><div class="stat-val">…</div><div class="stat-lbl">עובדים</div></div>
+    <div class="stat-card" id="stat-rent"><div class="stat-ico">🔑</div><div class="stat-val">…</div><div class="stat-lbl">שכירויות</div></div>
+    <div class="stat-card" id="stat-fuel"><div class="stat-ico">⛽</div><div class="stat-val">…</div><div class="stat-lbl">תלושי דלק פעילים</div></div>`;
+  document.getElementById('dash-mini').innerHTML = `
+    <div class="mini-stat"><div class="mini-val" style="color:var(--blue-dark)">${g.total}</div><div class="mini-lbl">מלאי למכירה</div></div>
+    <div class="mini-stat"><div class="mini-val" style="color:var(--orange)">${g.req}</div><div class="mini-lbl">עסקאות בתהליך</div></div>
+    <div class="mini-stat"><div class="mini-val" style="color:var(--green)">${g.sold}</div><div class="mini-lbl">עסקאות שנחתמו</div></div>
+    <div class="mini-stat"><div class="mini-val" style="color:var(--gold)">${fmtPrice(g.revenue)}</div><div class="mini-lbl">הכנסות ממכירות</div></div>`;
+  renderBarChart('dash-chart', g.perProject);
+  lazyLoadCount('employees', 'stat-emp');
+  lazyLoadCount('rentals', 'stat-rent');
+  lazyLoadCount('fuel', 'stat-fuel');
+}
+
+// ═══════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════
+function buildDonutGradient(parts) {
+  const total = parts.reduce((s, p) => s + p.val, 0) || 1;
+  let acc = 0;
+  return parts.map(p => {
+    const start = acc / total * 100; acc += p.val;
+    const end = acc / total * 100;
+    return `${p.color} ${start}% ${end}%`;
+  }).join(',');
+}
+
+function renderReports() {
+  const g = aggregateStats();
+  document.getElementById('rep-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-ico">💰</div><div class="stat-val">${fmtPrice(g.revenue)}</div><div class="stat-lbl">סה"כ הכנסות ממכירות</div></div>
+    <div class="stat-card"><div class="stat-ico">🤝</div><div class="stat-val">${g.sold + g.req}</div><div class="stat-lbl">עסקאות (חתומות + בתהליך)</div></div>
+    <div class="stat-card"><div class="stat-ico">🏢</div><div class="stat-val">${g.avail}</div><div class="stat-lbl">מלאי פנוי</div></div>
+    <div class="stat-card"><div class="stat-ico">📈</div><div class="stat-val">${g.total ? Math.round(g.sold / g.total * 100) : 0}%</div><div class="stat-lbl">אחוז מכירה כללי</div></div>`;
+  renderBarChart('rep-chart', g.perProject);
+
+  const other = Math.max(0, g.total - g.sold - g.req - g.avail);
+  const parts = [
+    { label: 'חתומות', val: g.sold, color: '#27500A' },
+    { label: 'בקשות רכישה', val: g.req, color: '#b8943a' },
+    { label: 'למכירה', val: g.avail, color: '#1e5fa8' },
+    { label: 'אחר (קרקע/השכרה)', val: other, color: '#9aabb0' }
+  ].filter(p => p.val > 0);
+  const gradient = buildDonutGradient(parts);
+  const legend = parts.map(p => `<div class="donut-leg-item"><span class="donut-dot" style="background:${p.color}"></span>${p.label}<b>${p.val}</b></div>`).join('');
+  document.getElementById('rep-donut').innerHTML = `
+    <div class="donut" style="background:conic-gradient(${gradient})">
+      <div class="donut-center"><b>${g.total}</b><span>סה"כ יח"ד</span></div>
+    </div>
+    <div class="donut-legend">${legend}</div>`;
+}
+
+function exportReportsPDF() {
+  const g = aggregateStats();
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  let html = '<div class="pdf-head"><div><div class="pdf-h1">מצלאוי חברה לבניין בע"מ</div>' +
+    '<div class="pdf-sub">דוח סיכום מכירות ומלאי</div></div>' +
+    '<div class="pdf-meta">הופק: ' + pdfEsc(dateStr) + '</div></div>';
+  html += '<div class="pdf-sec-title">סיכום כללי</div>';
+  html += '<table class="pdf-tbl"><thead><tr><th>סה"כ יח"ד</th><th>נחתמו</th><th>בקשות רכישה</th><th>פנוי למכירה</th><th>הכנסות</th></tr></thead><tbody>' +
+    '<tr><td>' + g.total + '</td><td>' + g.sold + '</td><td>' + g.req + '</td><td>' + g.avail + '</td><td class="num">' + pdfMoney(g.revenue) + '</td></tr>' +
+    '</tbody></table>';
+  html += '<div class="pdf-sec-title">פירוט לפי פרויקט</div>';
+  html += '<table class="pdf-tbl"><thead><tr><th>פרויקט</th><th>סה"כ יח"ד</th><th>נחתמו</th></tr></thead><tbody>';
+  g.perProject.forEach(p => { html += '<tr><td>' + pdfEsc(p.dname) + '</td><td>' + p.total + '</td><td>' + p.sold + '</td></tr>'; });
+  html += '</tbody></table>';
+  html += '<div class="pdf-foot">מצלאוי חברה לבניין בע"מ · דוח דוחות · הופק ' + pdfEsc(dateStr) + '</div>';
+  let area = document.getElementById('pdf-print-area');
+  if (!area) { area = document.createElement('div'); area.id = 'pdf-print-area'; document.body.appendChild(area); }
+  area.innerHTML = html;
+  window.print();
+}
+
+function shareReportsWhatsapp() {
+  const g = aggregateStats();
+  let msg = 'דוח מצלאוי — סיכום מכירות:\n';
+  msg += `מלאי כולל: ${g.total} יח"ד\nנחתמו: ${g.sold}\nבקשות רכישה: ${g.req}\nפנוי למכירה: ${g.avail}\nהכנסות ממכירות: ${fmtPrice(g.revenue)}\n`;
+  g.perProject.forEach(p => { msg += `${p.dname}: ${p.sold}/${p.total} נמכרו\n`; });
+  const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  const win = window.open(url, '_blank');
+  if (!win) location.href = url;
+}
+
+// ═══════════════════════════════════════
+// APT MODAL — עדכון סטטוס / רוכשים / חניה / מחסן
+// ═══════════════════════════════════════
+function toggleAptEdit() {
+  const p = document.getElementById('apt-edit-panel');
+  const show = p.style.display === 'none';
+  p.style.display = show ? 'block' : 'none';
+  if (show) populateAptEdit(currentAptRow);
+}
+
+function populateAptEdit(row) {
+  if (!row) return;
+  const sel = document.getElementById('edit-status');
+  sel.innerHTML = Object.values(STATUS).map(s =>
+    `<option value="${s}"${s === getStatus(row) ? ' selected' : ''}>${s}</option>`).join('');
+  document.getElementById('edit-buyers').value = getVal(row, COL.BUYERS);
+  document.getElementById('edit-parking').value = getVal(row, COL.PARKING);
+  document.getElementById('edit-storage').value = getVal(row, COL.STORAGE);
+  document.getElementById('edit-save-msg').textContent = '';
+  document.getElementById('edit-save-msg').style.color = '';
+}
+
+async function saveAptEdit() {
+  const r = currentAptRow;
+  const btn = document.getElementById('edit-save-btn');
+  const msg = document.getElementById('edit-save-msg');
+  if (!r || !r._row) {
+    msg.style.color = '#c0392b';
+    msg.textContent = '⚠️ לא ניתן לזהות את השורה בגיליון עבור דירה זו';
+    return;
+  }
+  const updates = {};
+  updates[colLetter(COL.STATUS)]  = document.getElementById('edit-status').value;
+  updates[colLetter(COL.BUYERS)]  = document.getElementById('edit-buyers').value.trim();
+  updates[colLetter(COL.PARKING)] = document.getElementById('edit-parking').value.trim();
+  updates[colLetter(COL.STORAGE)] = document.getElementById('edit-storage').value.trim();
+
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.textContent = 'שומר...';
+  msg.style.color = 'var(--text-sub)';
+  msg.textContent = '';
+  try {
+    await writeSheetCells(SHEET_ID, r._sheet, r._row, updates);
+    msg.style.color = 'var(--green)';
+    msg.textContent = '✓ נשמר בהצלחה — מרענן נתונים...';
+    await loadAllData();
+    const freshRows = allData[r._sheet] || [];
+    const fresh = freshRows.find(x => x._row === r._row);
+    if (activeBuilding && activeBuilding.projName === r._sheet) {
+      const bldRows = freshRows.filter(x => getVal(x, COL.BUILDING) === activeBuilding.bldName);
+      activeBuilding.rows = bldRows;
+      renderBuildingGrid(bldRows);
+    }
+    if (fresh) openAptModal(fresh);
+    msg.style.color = 'var(--green)';
+    msg.textContent = '✓ נשמר בהצלחה';
+  } catch(e) {
+    msg.style.color = '#c0392b';
+    msg.textContent = '⚠️ ' + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = orig;
+}
+
+// ═══════════════════════════════════════
+// בדיקת זמינות חניה / מחסן
+// ═══════════════════════════════════════
+function openAvailModal() {
+  document.getElementById('avail-input').value = '';
+  document.getElementById('avail-results').innerHTML = '';
+  document.getElementById('avail-modal').classList.add('open');
+  document.getElementById('avail-input').focus();
+}
+function closeAvailModal(e) {
+  if (!e || e.target === document.getElementById('avail-modal'))
+    document.getElementById('avail-modal').classList.remove('open');
+}
+function checkAvailability() {
+  const type = document.querySelector('input[name="avail-type"]:checked').value;
+  const q = document.getElementById('avail-input').value.trim();
+  const results = document.getElementById('avail-results');
+  results.innerHTML = '';
+  if (!q) { results.innerHTML = '<div class="empty-text" style="padding:10px 0;">הזן מספר לבדיקה</div>'; return; }
+  const col = type === 'parking' ? COL.PARKING : COL.STORAGE;
+  const typeLabel = type === 'parking' ? 'חניה' : 'מחסן';
+  const matches = allRows().filter(r => getVal(r, col).trim() === q);
+  if (!matches.length) {
+    const ok = document.createElement('div');
+    ok.style.cssText = 'background:var(--green-bg);color:var(--green);border-radius:10px;padding:12px 14px;font-weight:700;font-size:13.5px;';
+    ok.textContent = `✓ ${typeLabel} ${q} פנוי/ה — לא נמצא/ה שיוך לאף דירה בפרויקטים הפעילים`;
+    results.appendChild(ok);
+    return;
+  }
+  const warn = document.createElement('div');
+  warn.style.cssText = 'background:var(--orange-bg);color:var(--orange);border-radius:10px;padding:10px 14px;font-weight:700;font-size:13px;margin-bottom:10px;';
+  warn.textContent = `${typeLabel} ${q} משויכ/ת ל-${matches.length} דירה/ות:`;
+  results.appendChild(warn);
+  matches.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.innerHTML = `
+      <div class="result-apt">דירה ${getVal(r,COL.APT)}${getVal(r,COL.BUILDING) ? ' – ' + getVal(r,COL.BUILDING) : ''}</div>
+      <div class="result-proj">${DISPLAY_NAMES[r._sheet] || r._sheet}</div>
+      <div class="result-row" style="margin-top:8px;"><span class="rtag ${tagClass(r)}">${getStatus(r)}</span></div>`;
+    card.onclick = () => { closeAvailModal(); openAptModal(r); };
+    results.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════
+// הצגת קוד Apps Script בהגדרות
+// ═══════════════════════════════════════
+function toggleGasCode() {
+  const w = document.getElementById('gas-code-wrap');
+  w.style.display = w.style.display === 'none' ? 'block' : 'none';
+}
+
+
+let currentAptRow = null;
+
+function printAptModal() {
+  const r = currentAptRow;
+  if (!r) return;
+  const v = k => getVal(r, k);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  const head = 'דירה ' + v(COL.APT) + (v(COL.BUILDING) ? ' · ' + v(COL.BUILDING) : '') + (v(COL.FLOOR) ? ' · קומה ' + v(COL.FLOOR) : '');
+  const fields = [
+    ['פרויקט', DISPLAY_NAMES[r._sheet] || r._sheet], ['סטטוס', getStatus(r)], ['חדרים', v(COL.ROOMS)],
+    ['שטח', v(COL.AREA) ? v(COL.AREA) + ' מ"ר' : ''], ['כיוונים', v(COL.DIRS)], ['חניה', v(COL.PARKING)],
+    ['מחסן', v(COL.STORAGE)], ['רוכשים', v(COL.BUYERS)], ['מחיר', fmtPrice(parsePrice(v(COL.PRICE_SALE)) || parsePrice(v(COL.PRICE_ZERO))) ]
+  ];
+  const rowsHtml = fields.filter(([, val]) => val && String(val).trim())
+    .map(([k, val]) => '<div class="pdf-kv"><span class="k">' + pdfEsc(k) + '</span><span class="v">' + pdfEsc(val) + '</span></div>').join('');
+  let html = '<div class="pdf-head"><div><div class="pdf-h1">מצלאוי חברה לבניין בע"מ</div><div class="pdf-sub">כרטיס דירה</div></div>' +
+    '<div class="pdf-meta">הופק: ' + pdfEsc(dateStr) + '</div></div>' +
+    '<div class="pdf-card"><div class="pdf-card-head"><span>' + pdfEsc(head) + '</span></div><div class="pdf-card-grid">' + rowsHtml + '</div></div>';
+  let area = document.getElementById('pdf-print-area');
+  if (!area) { area = document.createElement('div'); area.id = 'pdf-print-area'; document.body.appendChild(area); }
+  area.innerHTML = html;
+  window.print();
+}
+
+function shareAptWhatsapp() {
+  const r = currentAptRow;
+  if (!r) return;
+  const v = k => getVal(r, k);
+  let msg = `דירה ${v(COL.APT)}${v(COL.BUILDING) ? ' · ' + v(COL.BUILDING) : ''} — ${DISPLAY_NAMES[r._sheet] || r._sheet}\n`;
+  msg += `סטטוס: ${getStatus(r)}\n`;
+  if (v(COL.ROOMS)) msg += `חדרים: ${v(COL.ROOMS)}\n`;
+  if (v(COL.AREA)) msg += `שטח: ${v(COL.AREA)} מ"ר\n`;
+  if (v(COL.FLOOR)) msg += `קומה: ${v(COL.FLOOR)}\n`;
+  const price = parsePrice(v(COL.PRICE_SALE)) || parsePrice(v(COL.PRICE_ZERO));
+  if (price) msg += `מחיר: ${fmtPrice(price)}\n`;
+  const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  const win = window.open(url, '_blank');
+  if (!win) location.href = url;
+}
 
 function toggleQuarter(el) {
   const q = el.dataset.q;
@@ -679,12 +1392,19 @@ function toggleQuarter(el) {
 // ═══════════════════════════════════════
 // SCREEN NAV
 // ═══════════════════════════════════════
+const SIDEBAR_MAP = { 's-landing':'dashboard', 's-home':'inventory', 's-project':'inventory', 's-building':'inventory', 's-search':'inventory', 's-setup':'settings', 's-reports':'reports' };
+function updateSidebarActive(key) {
+  document.querySelectorAll('.sb-item').forEach(it => it.classList.toggle('active', it.dataset.dest === key));
+}
 function showScreen(id, isBack) {
   const current = document.querySelector('.screen.active');
   if (current && current.id !== id && !isBack) navStack.push(current.id);
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  const content = document.getElementById('content-area');
+  if (content) content.scrollTo(0,0);
   window.scrollTo(0,0);
+  updateSidebarActive(SIDEBAR_MAP[id] || null);
 }
 let navStack = [];
 function goBack() {
@@ -790,6 +1510,7 @@ function openModule(key) {
   document.getElementById('module-sub').textContent = cfg.sub;
   document.getElementById('module-search').value = moduleSearchQ[key] || '';
   showScreen('s-module');
+  updateSidebarActive(key);
   // מודול הדלק נטען תמיד מחדש כדי לשקף יתרות מעודכנות (והסתרת תלושים שהתאפסו)
   if (key === 'fuel') loadModule(key, true);
   else if (moduleCache[key]) renderModule(key);
@@ -847,6 +1568,15 @@ const EMP_PRIMARY = [
   { label: 'כתובת מייל',  col: 4 }, // עמודה E
   { label: 'סיסמא למייל', col: 6, wa: true } // עמודה G + כפתור וואטסאפ
 ];
+
+// חיפוש עמודה לפי מילת מפתח בכותרת (לא תלוי אינדקס קבוע)
+function findColByHeader(headers, keywords) {
+  for (let i = 0; i < headers.length; i++) {
+    const h = (headers[i] || '').toString();
+    if (keywords.some(k => h.includes(k))) return i;
+  }
+  return -1;
+}
 
 // המרת מספר ישראלי לפורמט בינלאומי לוואטסאפ (972...)
 function normalizePhoneIL(raw) {
@@ -906,70 +1636,77 @@ function renderEmployees(key) {
   }
 
   const skip = new Set([EMP_TITLE_COL, ...EMP_PRIMARY.map(p => p.col)]);
-  const frag = document.createDocumentFragment();
-  rows.forEach(r => {
-    const card = document.createElement('div'); card.className = 'rec-card';
+  const roleCol = findColByHeader(headers, ['תפקיד']);
+  const deptCol = findColByHeader(headers, ['מחלקה', 'תחום']);
 
-    // כותרת כחולה — שם מלא (עמודה A)
-    const head = document.createElement('div'); head.className = 'rec-head';
+  const table = document.createElement('table'); table.className = 'data-table emp-table';
+  table.innerHTML = '<thead><tr><th style="width:26px;"></th><th>שם</th><th>תפקיד</th><th>מחלקה</th><th>נייד</th><th style="width:44px;"></th></tr></thead>';
+  const tbody = document.createElement('tbody');
+
+  rows.forEach(r => {
     let name = r[EMP_TITLE_COL] != null ? String(r[EMP_TITLE_COL]).trim() : '';
     if (!name) { const f = r.find(c => c != null && String(c).trim() !== ''); name = f != null ? String(f) : '—'; }
-    head.textContent = name;
-    card.appendChild(head);
+    const role = roleCol > -1 && r[roleCol] != null ? String(r[roleCol]).trim() : '';
+    const dept = deptCol > -1 && r[deptCol] != null ? String(r[deptCol]).trim() : '';
+    const phoneDisp = r[EMP_PHONE_COL] != null ? String(r[EMP_PHONE_COL]).trim() : '';
 
-    // שדות ראשיים — כותרת למעלה, נתון למטה
-    EMP_PRIMARY.forEach(p => {
-      const val = r[p.col] != null ? String(r[p.col]).trim() : '';
-      const fld = document.createElement('div'); fld.className = 'emp-field';
-      const main = document.createElement('div'); main.className = 'emp-field-main';
-      const l = document.createElement('div'); l.className = 'emp-lbl'; l.textContent = p.label;
-      const v = document.createElement('div'); v.className = 'emp-val'; v.textContent = val || '—';
-      main.append(l, v);
-      if (p.wa) {
-        fld.classList.add('emp-field-row');
-        fld.appendChild(main);
-        const phone = normalizePhoneIL(r[EMP_PHONE_COL]);
-        const first = r[EMP_FIRSTNAME_COL] != null ? String(r[EMP_FIRSTNAME_COL]).trim() : '';
-        if (phone && val) fld.appendChild(makeWaButton(phone, first, val));
-      } else {
-        fld.appendChild(main);
-      }
-      card.appendChild(fld);
-    });
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="status-dot active" title="פעיל"></span></td>` +
+      `<td class="emp-name-cell">${name}</td>` +
+      `<td>${role || '—'}</td>` +
+      `<td>${dept || '—'}</td>` +
+      `<td style="direction:ltr;text-align:left;">${phoneDisp || '—'}</td>` +
+      `<td></td>`;
+    const arrowTd = tr.lastElementChild;
+    const arrowBtn = document.createElement('button');
+    arrowBtn.className = 'emp-expand'; arrowBtn.style.cssText = 'width:100%;padding:4px;';
+    arrowBtn.innerHTML = '<span class="emp-arrow">▾</span>';
+    arrowTd.appendChild(arrowBtn);
+    tbody.appendChild(tr);
 
-    // פרטים נוספים — שאר העמודות, עם כותרות משורה 2
-    const details = document.createElement('div'); details.className = 'emp-details';
+    // שורת פרטים נוספים (מתקפלת)
+    const detailTr = document.createElement('tr'); detailTr.className = 'emp-detail-row'; detailTr.style.display = 'none';
+    const detailTd = document.createElement('td'); detailTd.colSpan = 6;
     const rb = document.createElement('div'); rb.className = 'rec-body';
     const maxCols = Math.max(headers.length, r.length);
-    let any = false;
+    EMP_PRIMARY.forEach(p => {
+      const val = r[p.col] != null ? String(r[p.col]).trim() : '';
+      if (!val) return;
+      const f = document.createElement('div'); f.className = 'rec-field emp-field-row';
+      const ls = document.createElement('span'); ls.className = 'rec-lbl'; ls.textContent = p.label;
+      const vs = document.createElement('span'); vs.className = 'rec-val'; vs.textContent = val;
+      f.append(ls, vs);
+      if (p.wa) {
+        const phone = normalizePhoneIL(r[EMP_PHONE_COL]);
+        const first = r[EMP_FIRSTNAME_COL] != null ? String(r[EMP_FIRSTNAME_COL]).trim() : '';
+        if (phone) { const wa = makeWaButton(phone, first, val); wa.classList.add('table-wa-btn'); f.appendChild(wa); }
+      }
+      rb.appendChild(f);
+    });
     for (let i = 0; i < maxCols; i++) {
-      if (skip.has(i)) continue;
+      if (skip.has(i) || i === roleCol || i === deptCol) continue;
       const val = r[i] != null ? String(r[i]).trim() : '';
       if (!val) continue;
-      any = true;
       const lbl = (headers[i] && headers[i].trim()) ? headers[i] : ('עמודה ' + (i + 1));
       const f = document.createElement('div'); f.className = 'rec-field';
       const ls = document.createElement('span'); ls.className = 'rec-lbl'; ls.textContent = lbl;
       const vs = document.createElement('span'); vs.className = 'rec-val'; vs.textContent = val;
       f.append(ls, vs); rb.appendChild(f);
     }
-    details.appendChild(rb);
+    detailTd.appendChild(rb);
+    detailTr.appendChild(detailTd);
+    tbody.appendChild(detailTr);
 
-    if (any) {
-      const btn = document.createElement('button'); btn.className = 'emp-expand';
-      const txt = document.createElement('span'); txt.textContent = 'פרטים נוספים';
-      const arr = document.createElement('span'); arr.className = 'emp-arrow'; arr.textContent = '▾';
-      btn.append(txt, arr);
-      btn.addEventListener('click', () => {
-        const open = card.classList.toggle('open');
-        txt.textContent = open ? 'הסתר פרטים' : 'פרטים נוספים';
-      });
-      card.appendChild(btn);
-      card.appendChild(details);
-    }
-    frag.appendChild(card);
+    const toggle = () => {
+      const open = detailTr.style.display !== 'none';
+      detailTr.style.display = open ? 'none' : 'table-row';
+      arrowBtn.querySelector('.emp-arrow').style.transform = open ? '' : 'rotate(180deg)';
+    };
+    tr.addEventListener('click', toggle);
   });
-  body.appendChild(frag);
+
+  table.appendChild(tbody);
+  body.appendChild(table);
 }
 
 // בונה את אזור "פרטים נוספים" + כפתור ההרחבה (משותף לדלק)
@@ -1605,7 +2342,7 @@ document.getElementById('btn-connect').onclick = async () => {
     await loadAllData();
     errEl.style.color = '';
     errEl.textContent = '';
-    showScreen('s-landing');
+    if (!connectedOnce) { connectedOnce = true; showScreen('s-landing'); }
   } catch(e) {
     errEl.style.color = '#c0392b';
     errEl.textContent = '⚠️ ' + e.message;
@@ -1637,6 +2374,16 @@ async function rescanNewSheets() {
     el.addEventListener('change', () => {
       FUEL_WRITE_URL = el.value.trim();
       localStorage.setItem('mtz_fuel_write_url', FUEL_WRITE_URL);
+    });
+  }
+  // כתובת הכתיבה למלאי — ברירת מחדל: אותה כתובת של תלושי הדלק (אם לא הוגדרה אחרת)
+  if (!INVENTORY_WRITE_URL) INVENTORY_WRITE_URL = FUEL_WRITE_URL;
+  const el2 = document.getElementById('inp-inv-write-url');
+  if (el2) {
+    el2.value = INVENTORY_WRITE_URL;
+    el2.addEventListener('change', () => {
+      INVENTORY_WRITE_URL = el2.value.trim();
+      localStorage.setItem('mtz_inv_write_url', INVENTORY_WRITE_URL);
     });
   }
 })();
@@ -1698,13 +2445,38 @@ async function fetchAllSheetNames() {
 function parseRows(values, sheetName) {
   if (!values || values.length < 2) return [];
   const headers = values[0];
-  return values.slice(1).map(row => {
-    const o = { _sheet: sheetName };
+  const range = SHEET_RANGES[sheetName];
+  const startRow = range ? range.dataStart : 2;
+  return values.slice(1).map((row, idx) => {
+    const o = { _sheet: sheetName, _row: startRow + idx };
     headers.forEach((h,i) => { o[h] = (row[i]||'').toString().trim(); });
     // map by position too
     row.forEach((v,i) => { o['_c'+i] = v ? v.toString().trim() : ''; });
     return o;
   }).filter(r => r['_c'+COL.APT] || r['_c'+COL.STATUS]);
+}
+
+// אות עמודה מאינדקס (0=A, 1=B, ...)
+function colLetter(idx) {
+  let n = idx + 1, s = '';
+  while (n > 0) { const rem = (n - 1) % 26; s = String.fromCharCode(65 + rem) + s; n = Math.floor((n - 1) / 26); }
+  return s;
+}
+
+// כתובת Apps Script לכתיבה חזרה לגיליון המלאי (ברירת מחדל: אותה כתובת של תלושי הדלק —
+// אם ה-Apps Script כללי, הוא כבר תומך גם בגיליון המלאי כי כל בקשה כוללת spreadsheetId משלה)
+let INVENTORY_WRITE_URL = localStorage.getItem('mtz_inv_write_url') || '';
+
+async function writeSheetCells(spreadsheetId, tab, row, updatesByLetter) {
+  if (!INVENTORY_WRITE_URL) throw new Error('לא הוגדרה כתובת Apps Script לשמירה (ראה הגדרות)');
+  const res = await fetch(INVENTORY_WRITE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ spreadsheetId, tab, row, updates: updatesByLetter })
+  });
+  let ok = res.ok;
+  try { const j = await res.json(); if (j && j.ok === false) ok = false; if (j && j.error) throw new Error(j.error); } catch(_) {}
+  if (!ok) throw new Error('שמירה נכשלה');
 }
 
 function getVal(row, colIdx) { return row['_c'+colIdx] || ''; }
@@ -1739,6 +2511,7 @@ async function loadAllData() {
     console.log('  Land2 rows:', l2.length, l2.slice(0,2).map(r=>getVal(r,COL.STATUS)));
   });
   renderHome();
+  renderDashboard();
   checkNewSheets(newSheets.filter(n => !ignoredSheets.includes(n)));
 }
 
@@ -1898,6 +2671,32 @@ function tagClass(row) {
 // ═══════════════════════════════════════
 // RENDER HOME
 // ═══════════════════════════════════════
+// באנר SVG דמוי קו רקיע — ייחודי לכל פרויקט (ללא תלות ברשת)
+function hashSeed(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return h;
+}
+function skylineSVG(seed) {
+  const h = hashSeed(seed);
+  const hue = 205 + (h % 40) - 20;
+  const c1 = `hsl(${hue},58%,22%)`, c2 = `hsl(${hue + 10},50%,34%)`;
+  let bldgs = '';
+  const n = 7;
+  for (let i = 0; i < n; i++) {
+    const seedI = (h >> (i * 3)) % 100;
+    const w = 22 + (seedI % 18);
+    const bh = 30 + (seedI % 46);
+    const x = i * (300 / n) + 4;
+    bldgs += `<rect x="${x}" y="${86 - bh}" width="${w}" height="${bh}" fill="rgba(255,255,255,${0.08 + (i % 3) * 0.04})"/>`;
+  }
+  return `<svg viewBox="0 0 300 86" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="g${h}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/>
+    </linearGradient></defs>
+    <rect width="300" height="86" fill="url(#g${h})"/>${bldgs}</svg>`;
+}
+
 function renderHome() {
   const body = document.getElementById('home-body');
   body.innerHTML = '';
@@ -1914,6 +2713,7 @@ function renderHome() {
     const card = document.createElement('div');
     card.className = 'proj-card';
     card.innerHTML = `
+      <div class="pc-photo">${skylineSVG(name)}</div>
       <div class="pc-head">
         <div style="flex:1">
           <div class="pc-name">${dname}</div>
@@ -2211,6 +3011,9 @@ function shortenDir(d) {
 // APT MODAL
 // ═══════════════════════════════════════
 function openAptModal(row) {
+  currentAptRow = row;
+  const editPanel = document.getElementById('apt-edit-panel');
+  if (editPanel) editPanel.style.display = 'none';
   const aptNum = getVal(row, COL.APT);
   const projName = DISPLAY_NAMES[row._sheet] || row._sheet;
   const bld = getVal(row, COL.BUILDING);
@@ -2696,10 +3499,14 @@ function applyFilters() {
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
-if (API_KEY) {
-  document.getElementById('inp-key').value = API_KEY;
-  document.getElementById('btn-connect').click();
-}
+(function initApp() {
+  const savedName = localStorage.getItem('mtz_user_name') || 'שלומי דבש';
+  document.getElementById('login-user').value = savedName;
+  applyUserName(savedName);
+  if (localStorage.getItem('mtz_logged_in') === '1') {
+    enterApp();
+  }
+})();
 </script>
 </body>
 </html>
